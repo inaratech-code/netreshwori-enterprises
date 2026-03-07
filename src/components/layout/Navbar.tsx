@@ -1,0 +1,196 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Menu, X, Phone, MessageCircle, Star } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+
+const NAV_LINKS = [
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Products", href: "/products" },
+    { name: "Testimonials", href: "/#testimonials" },
+    { name: "Contact", href: "/contact" },
+];
+
+const SCROLL_THRESHOLD = 80;
+
+export default function Navbar() {
+    const [isOpen, setIsOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+    const [visible, setVisible] = useState(true);
+    const lastScrollY = useRef(0);
+    const pathname = usePathname();
+
+    const isHome = pathname === "/";
+    const isScrolledOrNotHome = scrolled || !isHome;
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const y = window.scrollY;
+            setScrolled(y > 20);
+            if (y <= SCROLL_THRESHOLD) {
+                setVisible(true);
+            } else if (y > lastScrollY.current) {
+                setVisible(false);
+            } else {
+                setVisible(true);
+            }
+            lastScrollY.current = y;
+        };
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    return (
+        <nav
+            className={cn(
+                "fixed top-0 w-full z-50 transition-all duration-300",
+                !visible && "-translate-y-full",
+                isScrolledOrNotHome
+                    ? "bg-transparent py-1.5"
+                    : "bg-transparent py-2"
+            )}
+        >
+            <div className="container mx-auto px-4">
+                <div className="flex items-center justify-between">
+                    {/* Logo */}
+                    <Link
+                        href="/"
+                        className="flex items-center gap-2 shrink-0 transition-opacity duration-300 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 rounded"
+                    >
+                        <Image
+                            src="/logo/LOGO.png"
+                            alt="Netreshwori Enterprises"
+                            width={440}
+                            height={110}
+                            className="h-20 w-auto sm:h-24 md:h-28 lg:h-32 object-contain drop-shadow-sm"
+                            priority
+                        />
+                    </Link>
+
+                    {/* Desktop Nav */}
+                    <div className="hidden md:flex flex-1 items-center justify-center gap-5">
+                        {NAV_LINKS.map((link) => (
+                            <Link
+                                key={link.name}
+                                href={link.href}
+                                className={cn(
+                                    "text-sm font-semibold transition-colors hover:text-primary relative group focus:outline-none",
+                                    isScrolledOrNotHome ? "text-slate-600" : "text-white/90 hover:text-white",
+                                    pathname === link.href && "text-primary"
+                                )}
+                            >
+                                {link.name}
+                                {pathname === link.href && (
+                                    <motion.div
+                                        layoutId="navbar-indicator"
+                                        className="absolute -bottom-0.5 left-2 right-2 h-px bg-primary"
+                                    />
+                                )}
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Contact Buttons */}
+                    <div className="hidden md:flex items-center gap-3">
+                        <a
+                            href="tel:+9779864320452"
+                            className={cn(
+                                "flex items-center gap-1.5 text-xs font-medium transition-colors",
+                                isScrolledOrNotHome ? "text-slate-600 hover:text-primary" : "text-white/90 hover:text-white"
+                            )}
+                        >
+                            <Phone className="w-3 h-3" />
+                            <span>Call Us</span>
+                        </a>
+                        <Link
+                            href="/#testimonials"
+                            className={cn(
+                                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all hover:scale-105",
+                                isScrolledOrNotHome
+                                    ? "bg-primary text-white hover:bg-primary/90"
+                                    : "bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
+                            )}
+                        >
+                            <Star className="w-3 h-3" />
+                            <span>Testimonials</span>
+                        </Link>
+                        <a
+                            href="https://wa.me/9779864320452"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-full text-xs font-medium transition-transform hover:scale-105"
+                        >
+                            <MessageCircle className="w-3 h-3" />
+                            <span>WhatsApp</span>
+                        </a>
+                    </div>
+
+                    {/* Mobile Toggle */}
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="md:hidden p-3 -m-1 text-primary touch-manipulation"
+                        aria-label={isOpen ? "Close menu" : "Open menu"}
+                    >
+                        {isOpen ? <X /> : <Menu />}
+                    </button>
+                </div>
+            </div>
+
+            {/* Mobile Nav */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="md:hidden bg-white border-b"
+                    >
+                        <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
+                            {NAV_LINKS.map((link) => (
+                                <Link
+                                    key={link.name}
+                                    href={link.href}
+                                    onClick={() => setIsOpen(false)}
+                                    className="text-xl font-bold text-slate-800 hover:text-primary py-2 border-b border-slate-100 last:border-none"
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
+                            <div className="flex flex-col gap-3 pt-4 border-t border-slate-100">
+                                <Link
+                                    href="/#testimonials"
+                                    onClick={() => setIsOpen(false)}
+                                    className="flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-lg font-bold"
+                                >
+                                    <Star className="w-5 h-5" />
+                                    Testimonials
+                                </Link>
+                                <a
+                                    href="tel:+9779864320452"
+                                    className="flex items-center justify-center gap-2 bg-primary/10 text-primary py-3 rounded-lg font-medium"
+                                >
+                                    <Phone className="w-5 h-5" />
+                                    Call Us
+                                </a>
+                                <a
+                                    href="https://wa.me/9779864320452"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex items-center justify-center gap-2 bg-green-500 text-white py-3 rounded-lg font-medium"
+                                >
+                                    <MessageCircle className="w-5 h-5" />
+                                    WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </nav>
+    );
+}

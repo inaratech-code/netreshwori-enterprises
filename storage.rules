@@ -1,0 +1,35 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() &&
+        firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+
+    function isImage() {
+      return request.resource != null
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    function under10MB() {
+      return request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // Product images: any signed-in user can upload (so you can upload without running add-admin).
+    match /products/{fileName} {
+      allow read: if true;
+      allow create, update, delete: if signedIn() && isImage() && under10MB();
+    }
+
+    // All other paths: require admin (e.g. testimonials, media).
+    match /{allPaths=**} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isImage() && under10MB();
+    }
+  }
+}
+

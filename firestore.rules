@@ -1,0 +1,92 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Admins are controlled by a manual allowlist:
+    // Create a document at /admins/{uid} for each admin user.
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /admins/{uid} {
+      // Let users read their own admin doc (useful for UI gating)
+      allow read: if signedIn() && request.auth.uid == uid;
+      // Write is intentionally locked; manage admins via Firebase Console / CLI.
+      allow write: if false;
+    }
+
+    // Public catalog reads; admin-only writes.
+    match /brands/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /categories/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /products/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Settings are safe to read publicly (contact info, hero copy).
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Testimonials can be read publicly; admin manages approval, etc.
+    match /testimonials/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Inquiries: public can create, admins can manage.
+    match /inquiries/{id} {
+      allow create: if request.resource.data.keys().hasOnly([
+        "name", "phone", "email", "productId", "message", "status", "createdAt"
+      ])
+      && request.resource.data.name is string
+      && request.resource.data.phone is string
+      && request.resource.data.message is string
+      && (!("email" in request.resource.data) || request.resource.data.email is string)
+      && (!("productId" in request.resource.data) || request.resource.data.productId is string)
+      && request.resource.data.status in ["new", "contacted"]
+      && request.resource.data.createdAt == request.time;
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Analytics events: public can create; admins can read.
+    match /analytics_events/{id} {
+      allow create: if request.resource.data.keys().hasOnly([
+        "type", "page", "productId", "date", "hour", "timestamp"
+      ])
+      && request.resource.data.type in ["page_view", "product_view", "inquiry"]
+      && request.resource.data.date is string
+      && request.resource.data.hour is int
+      && (!("page" in request.resource.data) || request.resource.data.page is string)
+      && (!("productId" in request.resource.data) || request.resource.data.productId is string)
+      && request.resource.data.timestamp == request.time;
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Media library records: public read is OK if you use URLs on the site; admin-only writes.
+    match /media/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

@@ -28,9 +28,24 @@ yarn-error.log*
 # local env files
 .env*.local
 
+# Firebase service account key (for bulk-import script; do not commit)
+scripts/service-account.json
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+
+# build / dev logs
+build*.txt
+build_*.txt
+.dev-log*.txt
+
+# generated import data (from csv-to-json)
+products-import.json
+
+# IDE / editor
+.idea
+*.swp
+*.swo
