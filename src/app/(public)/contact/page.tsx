@@ -87,7 +87,7 @@ export default function ContactPage() {
                                         {card.subtitle && (
                                             <p className="text-slate-500 text-sm mb-2">{card.subtitle}</p>
                                         )}
-                                        {"items" in card ? (
+                                        {"items" in card && card.items ? (
                                             <div className="space-y-2">
                                                 {card.items.map((item) => (
                                                     <div key={item.label} className="flex flex-wrap items-center gap-2">
