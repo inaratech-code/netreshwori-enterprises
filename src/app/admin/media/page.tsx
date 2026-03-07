@@ -48,7 +48,7 @@ export default function AdminMediaPage() {
     try {
       for (const file of files) {
         const url = await uploadFile(mediaPath(file.name), file);
-        await addMediaItem({ url, path: mediaPath(file.name), name: file.name });
+        await addMediaItem({ url, path: mediaPath(file.name), name: file.name, createdAt: Date.now() });
       }
       toast.success(`${files.length} file(s) uploaded`);
       fetchMedia();
