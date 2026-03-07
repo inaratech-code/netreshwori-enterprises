@@ -14,7 +14,7 @@ const AdminCacheContext = createContext<{
 } | null>(null);
 
 export function AdminCacheProvider({ children }: { children: ReactNode }) {
-    const cacheRef = useRef<Record<CacheKey, CacheEntry<unknown> | undefined>>({});
+    const cacheRef = useRef<Partial<Record<CacheKey, CacheEntry<unknown>>>>({});
 
     const get = useCallback(<T,>(key: CacheKey): T | null => {
         const entry = cacheRef.current[key] as CacheEntry<T> | undefined;
