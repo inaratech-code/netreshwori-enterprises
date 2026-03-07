@@ -159,8 +159,12 @@ function ProductsContent() {
         : (p as { image?: string }).image
           ? [(p as { image?: string }).image!]
           : [];
-      const categoryName = p.categoryId ? categories.find((c) => c.id === p.categoryId)?.name ?? undefined;
-      const brandName = p.brandId ? brands.find((b) => b.id === p.brandId)?.name ?? undefined;
+      const categoryName = p.categoryId
+        ? (categories.find((c) => c.id === p.categoryId)?.name ?? undefined)
+        : undefined;
+      const brandName = p.brandId
+        ? (brands.find((b) => b.id === p.brandId)?.name ?? undefined)
+        : undefined;
       return {
         id: p.id,
         name: p.name,
