@@ -64,16 +64,9 @@ export default function ProductDetailPage() {
   const categoryName = product ? categories.find((c) => c.id === product.categoryId)?.name ?? "" : "";
   const brandName = product?.brandId ? brands.find((b) => b.id === product.brandId)?.name ?? "" : "";
   const rawImages = product?.images;
-  const imageValues: string[] = (() => {
-    if (Array.isArray(rawImages)) {
-      return rawImages.filter((u): u is string => typeof u === "string" && u.trim() !== "");
-    }
-    if (typeof rawImages === "string") {
-      const t = rawImages.trim();
-      return t !== "" ? [t] : [];
-    }
-    return [];
-  })();
+  const imageValues: string[] = Array.isArray(rawImages)
+    ? rawImages.filter((u): u is string => typeof u === "string" && u.trim() !== "")
+    : [];
   const images = imageValues.map(resolveProductImageSrc).filter(Boolean);
   const imgSrc = images[activeImage] ?? images[0];
 
