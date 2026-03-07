@@ -12,6 +12,7 @@ export async function trackProductView(productId: string) {
     productId,
     date,
     hour,
+    timestamp: now.getTime(),
   });
 }
 
@@ -25,5 +26,6 @@ export async function trackPageView(page: string) {
     page,
     date,
     hour,
+    timestamp: now.getTime(),
   });
 }
