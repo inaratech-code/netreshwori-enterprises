@@ -104,9 +104,6 @@ function ProductsContent() {
     return () => io.disconnect();
   }, [hasMore, loadingMore, loading, loadMore]);
 
-  const categoryNameById = (id: string) => categories.find((c) => c.id === id)?.name ?? "";
-  const brandNameById = (id: string) => brands.find((b) => b.id === id)?.name ?? "";
-
   const uniqueSizes = useMemo(() => {
     const set = new Set<string>();
     products.forEach((p) => {
