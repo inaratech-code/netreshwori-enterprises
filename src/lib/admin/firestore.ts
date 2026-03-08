@@ -246,6 +246,25 @@ export async function deleteProduct(id: string): Promise<void> {
   await deleteDoc(doc(db, COLLECTIONS.products, id));
 }
 
+/** Delete all products in the collection. Returns the number deleted. */
+export async function deleteAllProducts(): Promise<number> {
+  const BATCH_SIZE = 500;
+  let totalDeleted = 0;
+  let last: DocumentSnapshot | null = null;
+  for (;;) {
+    const q = last
+      ? query(productsCol(), orderBy("createdAt", "desc"), limit(BATCH_SIZE), startAfter(last))
+      : query(productsCol(), orderBy("createdAt", "desc"), limit(BATCH_SIZE));
+    const snap = await getDocs(q);
+    if (snap.empty) break;
+    await Promise.all(snap.docs.map((d) => deleteDoc(doc(db, COLLECTIONS.products, d.id))));
+    totalDeleted += snap.docs.length;
+    if (snap.docs.length < BATCH_SIZE) break;
+    last = snap.docs[snap.docs.length - 1];
+  }
+  return totalDeleted;
+}
+
 // ---- Inquiries ----
 export const inquiriesCol = () => collection(db, COLLECTIONS.inquiries);
 export async function getInquiries(): Promise<Inquiry[]> {

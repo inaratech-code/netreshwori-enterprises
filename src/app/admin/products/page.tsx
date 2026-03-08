@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { compressImage } from "@/lib/imageCompression";
 import { parseCsvToProducts } from "@/lib/parseCsv";
 import { PARTNER_BRAND_NAMES } from "@/data/partners";
+import { deleteAllProducts } from "@/lib/admin/firestore";
 import { resolveProductImageSrc } from "@/lib/utils";
 
 /** Thumbnail in Add/Edit form: resolves URL (e.g. Drive), shows preview or "Couldn't load" on error. */
@@ -180,6 +181,8 @@ export default function AdminProductsPage() {
     const [productsLoading, setProductsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
+    const [deletingAll, setDeletingAll] = useState(false);
     const [search, setSearch] = useState("");
     const [uploading, setUploading] = useState(false);
     const [imageUrlInput, setImageUrlInput] = useState("");
@@ -459,6 +462,25 @@ export default function AdminProductsPage() {
         } finally {
             setDeleteId(null);
             setLoading(false);
+        }
+    };
+
+    const handleDeleteAllProducts = async () => {
+        setDeletingAll(true);
+        const toastId = toast.loading("Deleting all products...");
+        try {
+            const count = await deleteAllProducts();
+            setProducts([]);
+            setLastProductDoc(null);
+            setHasMoreProducts(false);
+            setDeleteAllModalOpen(false);
+            toast.success(`${count} product${count !== 1 ? "s" : ""} deleted`, { id: toastId });
+            cache.invalidate("products");
+        } catch (error) {
+            console.error("Delete all error:", error);
+            toast.error("Failed to delete all products", { id: toastId });
+        } finally {
+            setDeletingAll(false);
         }
     };
 
@@ -800,7 +822,15 @@ export default function AdminProductsPage() {
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Products Management</h1>
                     <p className="text-slate-500">Manage your product catalog and inventory.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                    <button
+                        type="button"
+                        onClick={() => setDeleteAllModalOpen(true)}
+                        className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-colors duration-200 active:scale-[0.98]"
+                    >
+                        <Trash2 className="w-5 h-5" />
+                        <span className="hidden sm:inline">Delete all</span>
+                    </button>
                     <button type="button" onClick={handleExportCsv} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-colors duration-200 active:scale-[0.98]">
                         <Download className="w-5 h-5" />
                         <span className="hidden sm:inline">Export CSV</span>
@@ -1102,6 +1132,34 @@ export default function AdminProductsPage() {
                                 className="px-4 py-2 font-medium text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors shadow-sm shadow-red-500/20 disabled:opacity-50"
                             >
                                 {loading ? "Deleting..." : "Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete all products modal */}
+            {deleteAllModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 fade-in">
+                        <div className="p-6">
+                            <h3 className="text-xl font-bold text-slate-900 mb-2">Delete all products?</h3>
+                            <p className="text-slate-500">This will permanently delete every product in the catalog. This action cannot be undone.</p>
+                        </div>
+                        <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                            <button
+                                onClick={() => !deletingAll && setDeleteAllModalOpen(false)}
+                                disabled={deletingAll}
+                                className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-200/50 rounded-xl transition-colors disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteAllProducts}
+                                disabled={deletingAll}
+                                className="px-4 py-2 font-medium text-white bg-foreground hover:bg-foreground/90 rounded-xl transition-colors disabled:opacity-50"
+                            >
+                                {deletingAll ? "Deleting..." : "Delete all"}
                             </button>
                         </div>
                     </div>
