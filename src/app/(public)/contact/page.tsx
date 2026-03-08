@@ -19,8 +19,8 @@ const contactCards = [
         iconClass: "bg-primary/10 text-primary",
         title: "Our Offices",
         items: [
-            { label: "Head Office", href: HEAD_OFFICE_MAPS },
-            { label: "Branch Office", href: BRANCH_OFFICE_MAPS },
+            { label: "Head Office Directions →", href: HEAD_OFFICE_MAPS },
+            { label: "Branch Office Directions →", href: BRANCH_OFFICE_MAPS },
         ],
     },
     {
@@ -117,15 +117,14 @@ export default function ContactPage() {
                                         {"items" in card && card.items ? (
                                             <div className="space-y-2">
                                                 {card.items.map((item) => (
-                                                    <div key={item.label} className="flex flex-wrap items-center gap-2">
-                                                        <span className="text-slate-800 text-sm font-medium">{item.label}</span>
+                                                    <div key={item.label}>
                                                         <a
                                                             href={item.href}
                                                             target="_blank"
                                                             rel="noreferrer"
                                                             className="text-slate-900 font-medium text-sm hover:text-slate-700 hover:underline"
                                                         >
-                                                            Directions →
+                                                            {item.label}
                                                         </a>
                                                     </div>
                                                 ))}

@@ -4,17 +4,20 @@ import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
+/**
+ * Cover images from public/categories/ (used when path starts with /).
+ * Missing covers fall back to Unsplash URLs.
+ */
 export const CATEGORIES = [
-    { id: "cement", name: "Cement", image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800", desc: "Quality cement for construction and building." },
-    { id: "cpvc-pvc", name: "CPVC / PVC", image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80&w=800", desc: "Pipes and fittings for plumbing and drainage." },
+    { id: "cement", name: "Cement", image: "/categories/cement.png", desc: "Quality cement for construction and building." },
+    { id: "cpvc-pvc", name: "CPVC / PVC", image: "/categories/cpvc-pvc.png", desc: "Pipes and fittings for plumbing and drainage." },
     { id: "sanitary", name: "Sanitary", image: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&q=80&w=800", desc: "Sanitary ware for bathrooms and kitchens." },
     { id: "granite-marble", name: "Granite / Marble", image: "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=800", desc: "Natural stone for elegance and durability." },
     { id: "bathroom-fittings", name: "Bathroom Fittings", image: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&q=80&w=800", desc: "Faucets, showers and bathroom accessories." },
-    { id: "wall-floor-tile", name: "Wall / Floor Tile", image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800", desc: "Tiles for walls and floors." },
-    { id: "floor-tile", name: "Floor Tile", image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=800", desc: "Durable floor tiles for every space." },
-    { id: "parking-floor-tile", name: "Parking Floor Tile", image: "https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=800", desc: "Heavy-duty tiles for parking and commercial." },
-    { id: "wall-elevation-tile", name: "Wall, Elevation Tile", image: "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&q=80&w=800", desc: "Elevation and wall cladding tiles." },
-    { id: "floor-parking-tile", name: "Floor, Parking Tile", image: "https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=800", desc: "Floor and parking solutions." },
+    { id: "wall-floor-tile", name: "Wall / Floor Tile", image: "/categories/wall%20and%20floor%20.png", desc: "Tiles for walls and floors." },
+    { id: "floor-tile", name: "Floor Tile", image: "/categories/floor%20tiles.png", desc: "Durable floor tiles for every space." },
+    { id: "parking-tile", name: "Parking Tile", image: "/categories/parking%20tiles.png", desc: "Heavy-duty tiles for parking and commercial." },
+    { id: "wall-elevation-tile", name: "Wall, Elevation Tile", image: "/categories/allivation%20tiles.png", desc: "Elevation and wall cladding tiles." },
 ];
 
 const containerVariants: Variants = {
