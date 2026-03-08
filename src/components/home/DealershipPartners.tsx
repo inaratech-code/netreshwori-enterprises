@@ -59,10 +59,10 @@ export default function DealershipPartners() {
                     transition={{ duration: 0.4 }}
                     className="text-center mb-10"
                 >
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
+                    <h2 className="text-2xl md:text-3xl font-bold text-white">
                         Our <span className="text-primary">Dealership</span> Partners
                     </h2>
-                    <p className="text-slate-600 mt-2 max-w-xl mx-auto">
+                    <p className="text-slate-300 mt-2 max-w-xl mx-auto">
                         Authorized dealer for trusted brands in building and interior materials.
                     </p>
                 </motion.div>

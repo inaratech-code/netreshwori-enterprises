@@ -26,10 +26,10 @@ export default function AboutPage() {
 
                 {/* Header */}
                 <div className="text-center mb-16 max-w-2xl mx-auto">
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
+                    <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
                         About <span className="text-primary">Us</span>
                     </h1>
-                    <p className="text-lg text-slate-600 leading-relaxed">
+                    <p className="text-lg text-slate-300 leading-relaxed">
                         Trusted in building and interior materials since 2065 B.S.
                     </p>
                 </div>
@@ -53,10 +53,10 @@ export default function AboutPage() {
 
                     {/* Founders */}
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                            Our <span className="text-primary">Founders</span>
+<h2 className="text-2xl font-bold text-white mb-2">
+                        Our <span className="text-primary">Founders</span>
                         </h2>
-                        <p className="text-slate-600 mb-6">The people behind Netreshwori Enterprise</p>
+                        <p className="text-slate-300 mb-6">The people behind Netreshwori Enterprise</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             {FOUNDERS.map((member, index) => (
                                 <motion.div
@@ -77,7 +77,7 @@ export default function AboutPage() {
                                     </div>
                                     <div className="p-4 text-center">
                                         <h3 className="text-lg font-bold text-slate-900">{member.name}</h3>
-                                        <p className="text-primary font-semibold text-sm mt-1">{member.role}</p>
+                                        <p className="text-slate-600 font-semibold text-sm mt-1">{member.role}</p>
                                     </div>
                                 </motion.div>
                             ))}

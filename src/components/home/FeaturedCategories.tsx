@@ -54,16 +54,16 @@ export default function FeaturedCategories() {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
                     <div className="max-w-2xl">
-                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
+                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
                             Explore Our <span className="text-primary">Categories</span>
                         </h2>
-                        <p className="text-lg text-slate-600 leading-relaxed">
+                        <p className="text-lg text-slate-300 leading-relaxed">
                             From the timeless elegance of marble to the resilient beauty of porcelain, discover collections curated to elevate your living spaces.
                         </p>
                     </div>
                     <Link
                         href="/products"
-                        className="group flex flex-col items-center justify-center shrink-0 w-32 h-32 rounded-full border border-slate-200 hover:border-primary text-slate-900 hover:text-primary transition-all hover:bg-white hover:shadow-xl hover:shadow-primary/5 bg-transparent"
+                        className="group flex flex-col items-center justify-center shrink-0 w-32 h-32 rounded-full border border-white/30 hover:border-primary text-white hover:text-primary transition-all hover:bg-white/10 hover:shadow-xl hover:shadow-primary/5 bg-transparent"
                     >
                         <span className="font-semibold text-sm">View All</span>
                         <ArrowUpRight className="w-5 h-5 mt-1 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />

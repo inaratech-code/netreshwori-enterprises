@@ -80,15 +80,15 @@ export default function Navbar() {
                                 href={link.href}
                                 className={cn(
                                     "text-sm font-semibold transition-colors hover:text-primary relative group focus:outline-none",
-                                    isScrolledOrNotHome ? "text-slate-600" : "text-white/90 hover:text-white",
-                                    pathname === link.href && "text-primary"
+                                    "text-white/90 hover:text-white",
+                                    pathname === link.href && "text-white"
                                 )}
                             >
                                 {link.name}
                                 {pathname === link.href && (
                                     <motion.div
                                         layoutId="navbar-indicator"
-                                        className="absolute -bottom-0.5 left-2 right-2 h-px bg-primary"
+                                        className="absolute -bottom-0.5 left-2 right-2 h-px bg-white"
                                     />
                                 )}
                             </Link>
@@ -111,9 +111,7 @@ export default function Navbar() {
                             href="/#testimonials"
                             className={cn(
                                 "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all hover:scale-105",
-                                isScrolledOrNotHome
-                                    ? "bg-primary text-white hover:bg-primary/90"
-                                    : "bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
+                                "bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
                             )}
                         >
                             <Star className="w-3 h-3" />
@@ -148,7 +146,7 @@ export default function Navbar() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden bg-white border-b"
+                        className="md:hidden bg-brand-gradient border-b border-white/10"
                     >
                         <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
                             {NAV_LINKS.map((link) => (
@@ -156,12 +154,12 @@ export default function Navbar() {
                                     key={link.name}
                                     href={link.href}
                                     onClick={() => setIsOpen(false)}
-                                    className="text-xl font-bold text-slate-800 hover:text-primary py-2 border-b border-slate-100 last:border-none"
+                                    className="text-xl font-bold text-white hover:text-primary py-2 border-b border-white/10 last:border-none"
                                 >
                                     {link.name}
                                 </Link>
                             ))}
-                            <div className="flex flex-col gap-3 pt-4 border-t border-slate-100">
+                            <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
                                 <Link
                                     href="/#testimonials"
                                     onClick={() => setIsOpen(false)}

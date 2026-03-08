@@ -4,37 +4,37 @@
 
 @layer base {
   :root {
-    --background: 210 4% 80%; /* #CBCDCF */
-    --foreground: 0 0% 3.9%;
-    /* Gradient palette for site-wide #CBCDCF gradients */
-    --brand-bg: #CBCDCF;
-    --brand-bg-light: #e1e3e5;
-    --brand-bg-dark: #b5b7b9;
+    --background: 220 10% 18%; /* dark mid-tone */
+    --foreground: 0 0% 98%;
+    /* Dark gradient: top #5A606A → mid #2E3238 → bottom #1E2024 */
+    --brand-bg: #2E3238;
+    --brand-bg-light: #5A606A;
+    --brand-bg-dark: #1E2024;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card: 220 10% 22%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
+    --popover: 220 10% 22%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 220 10% 18%;
 
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
+    --secondary: 220 8% 28%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
+    --muted: 220 8% 26%;
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 220 8% 28%;
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --border: 220 8% 32%;
+    --input: 220 8% 32%;
+    --ring: 0 0% 70%;
 
     --radius: 0.5rem;
 
@@ -62,12 +62,12 @@
   }
 }
 
-/* Section gradients using #CBCDCF */
+/* Section gradients – dark charcoal/slate */
 .bg-brand-gradient {
   background: linear-gradient(180deg, var(--brand-bg-light) 0%, var(--brand-bg) 50%, var(--brand-bg-dark) 100%);
 }
 .bg-brand-gradient-subtle {
-  background: linear-gradient(180deg, rgba(203, 205, 207, 0.4) 0%, rgba(203, 205, 207, 0.7) 100%);
+  background: linear-gradient(180deg, rgba(90, 96, 106, 0.5) 0%, rgba(46, 50, 56, 0.8) 100%);
 }
 
 /* Custom scrollbar and utilities */

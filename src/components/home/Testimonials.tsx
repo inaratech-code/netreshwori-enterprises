@@ -45,7 +45,7 @@ export default function Testimonials() {
         <section id="testimonials" className="py-24 bg-brand-gradient overflow-hidden">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
+                    <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
                         Client <span className="text-primary">Testimonials</span>
                     </h2>
                     <p className="text-lg text-slate-600 max-w-2xl mx-auto">
@@ -91,13 +91,13 @@ export default function Testimonials() {
                     <div className="flex justify-center gap-4 mt-8">
                         <button
                             onClick={prev}
-                            className="p-3 rounded-full border border-slate-200 text-slate-600 hover:text-primary hover:border-primary transition-colors hover:bg-slate-50"
+                            className="p-3 rounded-full border border-white/40 text-slate-300 hover:text-primary hover:border-primary transition-colors hover:bg-white/10"
                         >
                             <ChevronLeft className="w-6 h-6" />
                         </button>
                         <button
                             onClick={next}
-                            className="p-3 rounded-full border border-slate-200 text-slate-600 hover:text-primary hover:border-primary transition-colors hover:bg-slate-50"
+                            className="p-3 rounded-full border border-white/40 text-slate-300 hover:text-primary hover:border-primary transition-colors hover:bg-white/10"
                         >
                             <ChevronRight className="w-6 h-6" />
                         </button>

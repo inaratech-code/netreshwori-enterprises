@@ -59,7 +59,7 @@ export default function ContactPage() {
 
                 {/* Header */}
                 <header className="text-center mb-8">
-                    <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 tracking-tight">
+                    <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">
                         Get in <span className="text-primary">Touch</span>
                     </h1>
                     <p className="text-slate-600 text-sm max-w-xl mx-auto">
@@ -71,7 +71,7 @@ export default function ContactPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 mb-12 lg:mb-16">
                     {/* Contact cards */}
                     <div className="space-y-4">
-                        <h2 className="text-xl font-bold text-slate-900 mb-6">Contact Information</h2>
+                        <h2 className="text-xl font-bold text-white mb-6">Contact Information</h2>
                         {contactCards.map((card) => {
                             const Icon = card.icon;
                             return (

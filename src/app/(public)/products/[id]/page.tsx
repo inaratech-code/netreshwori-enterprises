@@ -85,7 +85,7 @@ export default function ProductDetailPage() {
     return (
       <div className="bg-brand-gradient min-h-screen pt-24 pb-16">
         <div className="container mx-auto px-4 py-24 text-center">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Product not found</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">Product not found</h1>
           <Link href="/products" className="text-primary font-medium hover:underline">
             Back to products
           </Link>
@@ -97,12 +97,12 @@ export default function ProductDetailPage() {
   return (
     <div className="bg-brand-gradient min-h-screen pt-24 pb-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="flex text-slate-500 text-sm mb-8 font-medium">
+        <nav className="flex text-slate-400 text-sm mb-8 font-medium">
           <Link href="/" className="hover:text-primary transition-colors">Home</Link>
           <ChevronRight className="w-4 h-4 mx-2" />
           <Link href="/products" className="hover:text-primary transition-colors">Products</Link>
           <ChevronRight className="w-4 h-4 mx-2" />
-          <span className="text-slate-900 truncate max-w-[200px]">{product.name}</span>
+          <span className="text-white truncate max-w-[200px]">{product.name}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-24">
@@ -156,13 +156,13 @@ export default function ProductDetailPage() {
                 {categoryName}
               </span>
             )}
-            <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight leading-tight">
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight leading-tight">
               {product.name}
             </h1>
             <div className="flex items-center gap-4 text-sm font-medium flex-wrap mb-6">
               {brandName && (
                 <span className="text-slate-500 border-r border-slate-200 pr-4">
-                  Brand: <span className="text-slate-900 uppercase tracking-wide">{brandName}</span>
+                  Brand: <span className="text-white uppercase tracking-wide">{brandName}</span>
                 </span>
               )}
               {(product.size || product.finish) && (
@@ -193,8 +193,8 @@ export default function ProductDetailPage() {
 
             {(product.size || product.finish || product.productCode) && (
               <div className="mt-4">
-                <h3 className="text-xl font-bold text-slate-900 mb-6 flex relative">
-                  <span className="relative z-10 bg-white pr-4">Details</span>
+                <h3 className="text-xl font-bold text-white mb-6 flex relative">
+                  <span className="relative z-10 bg-brand-gradient pr-4">Details</span>
                   <div className="absolute top-1/2 left-0 w-full h-px bg-slate-200 -z-0" />
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -239,7 +239,7 @@ export default function ProductDetailPage() {
 
         {similarProducts.length > 0 && (
           <section className="border-t border-slate-200 pt-16">
-            <h2 className="text-2xl font-bold text-slate-900 mb-8">Similar products</h2>
+            <h2 className="text-2xl font-bold text-white mb-8">Similar products</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {similarProducts.map((p) => {
                 const images = Array.isArray(p.images) ? p.images : (p as { image?: string }).image ? [(p as { image?: string }).image!] : [];
