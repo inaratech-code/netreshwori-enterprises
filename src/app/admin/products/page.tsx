@@ -1011,7 +1011,7 @@ export default function AdminProductsPage() {
                                         tableScrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
                                     }}
                                     disabled={tablePage <= 1}
-                                    className="p-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:pointer-events-none transition-colors"
+                                    className="p-2 rounded-lg bg-slate-200 text-slate-800 border border-slate-300 hover:bg-slate-300 disabled:opacity-50 disabled:pointer-events-none transition-colors"
                                 >
                                     <ChevronLeft className="w-5 h-5" />
                                 </button>
@@ -1022,7 +1022,7 @@ export default function AdminProductsPage() {
                                         tableScrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
                                     }}
                                     disabled={tablePage >= totalPages}
-                                    className="p-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:pointer-events-none transition-colors"
+                                    className="p-2 rounded-lg bg-slate-200 text-slate-800 border border-slate-300 hover:bg-slate-300 disabled:opacity-50 disabled:pointer-events-none transition-colors"
                                 >
                                     <ChevronRight className="w-5 h-5" />
                                 </button>
