@@ -67,7 +67,7 @@ export default function Navbar() {
                             alt="Netreshwori Enterprises"
                             width={440}
                             height={110}
-                            className="h-20 w-auto sm:h-24 md:h-28 lg:h-32 object-contain drop-shadow-sm"
+                            className="h-24 w-auto sm:h-28 md:h-32 lg:h-36 object-contain drop-shadow-sm"
                             priority
                         />
                     </Link>
@@ -79,7 +79,7 @@ export default function Navbar() {
                                 key={link.name}
                                 href={link.href}
                                 className={cn(
-                                    "text-sm font-semibold transition-colors hover:text-primary relative group focus:outline-none",
+                                    "text-base font-semibold transition-colors hover:text-primary relative group focus:outline-none",
                                     "text-white/90 hover:text-white",
                                     pathname === link.href && "text-white"
                                 )}
