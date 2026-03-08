@@ -44,7 +44,7 @@ export default function AdminDashboardCharts({ chartData }: { chartData?: ChartD
                                 <RechartsTooltip
                                     contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
                                 />
-                                <Line type="monotone" dataKey="count" stroke="#3b82f6" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                                <Line type="monotone" dataKey="count" stroke="#374151" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
@@ -61,7 +61,7 @@ export default function AdminDashboardCharts({ chartData }: { chartData?: ChartD
                                     cursor={{ fill: "#f1f5f9" }}
                                     contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
                                 />
-                                <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="count" fill="#4b5563" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -85,7 +85,7 @@ export default function AdminDashboardCharts({ chartData }: { chartData?: ChartD
                                     <tr key={product.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                                         <td className="p-4 text-slate-900 font-medium">{product.name}</td>
                                         <td className="p-4 text-slate-600">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-sm font-medium">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-sm font-medium">
                                                 <Eye className="w-3.5 h-3.5" />
                                                 {product.views}
                                             </span>

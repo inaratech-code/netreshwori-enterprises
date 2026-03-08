@@ -103,12 +103,16 @@ export default function AdminBrandsPage() {
       toast.error("Brand name is required");
       return;
     }
+    const partnerLogo = DEALERSHIP_PARTNERS.find(
+      (p) => p.name.toLowerCase().trim() === form.name?.toLowerCase().trim()
+    )?.logo;
+    const logoToSave = form.logo || partnerLogo || "";
     const toastId = toast.loading(form.id ? "Updating..." : "Creating...");
     try {
       if (form.id) {
         await updateBrand(form.id, {
           name: form.name.trim(),
-          logo: form.logo || "",
+          logo: logoToSave,
           description: form.description || "",
           status: form.status || "active",
         });
@@ -116,7 +120,7 @@ export default function AdminBrandsPage() {
       } else {
         await createBrand({
           name: form.name.trim(),
-          logo: form.logo || "",
+          logo: logoToSave,
           description: form.description || "",
           status: form.status || "active",
         });
@@ -336,18 +340,18 @@ export default function AdminBrandsPage() {
         </CardContent>
       </Card>
 
-      {/* Add/Edit Modal */}
+      {/* Add/Edit Modal – black & white only */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md border-border bg-card text-card-foreground">
           <DialogHeader>
-            <DialogTitle>{form.id ? "Edit Brand" : "Add Brand"}</DialogTitle>
+            <DialogTitle className="text-card-foreground">{form.id ? "Edit Brand" : "Add Brand"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             {!form.id && (
               <div className="space-y-2">
-                <Label>Use name & logo from partner</Label>
+                <Label className="text-foreground">Use name & logo from partner</Label>
                 <select
-                  className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+                  className="w-full border border-border rounded-md px-3 py-2 text-sm bg-background text-foreground"
                   value=""
                   onChange={(e) => {
                     const name = e.target.value;
@@ -362,8 +366,14 @@ export default function AdminBrandsPage() {
                 </select>
               </div>
             )}
+            {(() => {
+              const partnerForForm = DEALERSHIP_PARTNERS.find(
+                (p) => p.name.toLowerCase().trim() === (form.name ?? "").toLowerCase().trim()
+              );
+              const displayLogo = form.logo || partnerForForm?.logo;
+              return (
             <div className="space-y-2">
-              <Label>Logo</Label>
+              <Label className="text-foreground">Logo</Label>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -372,9 +382,9 @@ export default function AdminBrandsPage() {
                 onChange={handleLogoUpload}
               />
               <div className="flex items-center gap-4">
-                {form.logo ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- dynamic Firebase Storage URL
-                  <img src={form.logo} alt="" className="h-20 w-20 object-contain rounded border" />
+                {displayLogo ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- from form or partners folder
+                  <img src={displayLogo} alt="" className="h-20 w-20 object-contain rounded border" />
                 ) : (
                   <div className="h-20 w-20 rounded border bg-muted flex items-center justify-center">
                     <Building2 className="h-10 w-10 text-muted-foreground" />
@@ -385,64 +395,90 @@ export default function AdminBrandsPage() {
                   variant="outline"
                   disabled={uploading}
                   onClick={() => fileInputRef.current?.click()}
+                  className="border-border text-foreground hover:bg-muted hover:text-foreground"
                 >
                   {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Upload"}
                 </Button>
               </div>
             </div>
+            );
+            })()}
             <div className="space-y-2">
-              <Label htmlFor="brand-name">Brand Name *</Label>
+              <Label htmlFor="brand-name" className="text-foreground">Brand Name *</Label>
               <Input
                 id="brand-name"
                 value={form.name ?? ""}
                 onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                 placeholder="e.g. Kajaria"
+                className="border-border bg-background text-foreground placeholder:text-muted-foreground"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="brand-desc">Description</Label>
+              <Label htmlFor="brand-desc" className="text-foreground">Description</Label>
               <Textarea
                 id="brand-desc"
                 value={form.description ?? ""}
                 onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
                 placeholder="Short description"
                 rows={3}
+                className="border-border bg-background text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div className="flex gap-2">
-              <Label>Status</Label>
+              <Label className="text-foreground">Status</Label>
               <select
                 value={form.status ?? "active"}
                 onChange={(e) => setForm((p) => ({ ...p, status: e.target.value as "active" | "inactive" }))}
-                className="border rounded-md px-3 py-2 text-sm"
+                className="border border-border rounded-md px-3 py-2 text-sm bg-background text-foreground"
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                className="border-border text-foreground hover:bg-muted hover:text-foreground"
+              >
                 Cancel
               </Button>
-              <Button type="submit">{form.id ? "Update" : "Create"}</Button>
+              <Button
+                type="submit"
+                className="bg-foreground text-primary-foreground hover:bg-foreground/90"
+              >
+                {form.id ? "Update" : "Create"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirmation */}
+      {/* Delete confirmation – black & white only */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent>
+        <DialogContent className="border-border bg-card text-card-foreground">
           <DialogHeader>
-            <DialogTitle>Delete Brand</DialogTitle>
+            <DialogTitle className="text-card-foreground">Delete Brand</DialogTitle>
             <p className="text-sm text-muted-foreground">
               This cannot be undone. Products linked to this brand will keep the reference.
             </p>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteId(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteId(null)}
+              className="border-border text-foreground hover:bg-muted hover:text-foreground"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDelete}
+              className="bg-foreground text-primary-foreground hover:bg-foreground/90"
+            >
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
