@@ -5,30 +5,16 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 export const CATEGORIES = [
-    {
-        id: "ceramic",
-        name: "Ceramic Tiles",
-        image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800",
-        desc: "Versatile and durable for everyday use.",
-    },
-    {
-        id: "porcelain",
-        name: "Porcelain Tiles",
-        image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=800",
-        desc: "High density and low water absorption.",
-    },
-    {
-        id: "marble",
-        name: "Marble",
-        image: "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=800",
-        desc: "Timeless luxury and unparalleled beauty.",
-    },
-    {
-        id: "mosaic",
-        name: "Mosaic Tiles",
-        image: "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&q=80&w=800",
-        desc: "Intricate patterns for striking accents.",
-    },
+    { id: "cement", name: "Cement", image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800", desc: "Quality cement for construction and building." },
+    { id: "cpvc-pvc", name: "CPVC / PVC", image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80&w=800", desc: "Pipes and fittings for plumbing and drainage." },
+    { id: "sanitary", name: "Sanitary", image: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&q=80&w=800", desc: "Sanitary ware for bathrooms and kitchens." },
+    { id: "granite-marble", name: "Granite / Marble", image: "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=800", desc: "Natural stone for elegance and durability." },
+    { id: "bathroom-fittings", name: "Bathroom Fittings", image: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&q=80&w=800", desc: "Faucets, showers and bathroom accessories." },
+    { id: "wall-floor-tile", name: "Wall / Floor Tile", image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800", desc: "Tiles for walls and floors." },
+    { id: "floor-tile", name: "Floor Tile", image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=800", desc: "Durable floor tiles for every space." },
+    { id: "parking-floor-tile", name: "Parking Floor Tile", image: "https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=800", desc: "Heavy-duty tiles for parking and commercial." },
+    { id: "wall-elevation-tile", name: "Wall, Elevation Tile", image: "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&q=80&w=800", desc: "Elevation and wall cladding tiles." },
+    { id: "floor-parking-tile", name: "Floor, Parking Tile", image: "https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=800", desc: "Floor and parking solutions." },
 ];
 
 const containerVariants: Variants = {
@@ -58,7 +44,7 @@ export default function FeaturedCategories() {
                             Explore Our <span className="text-primary">Categories</span>
                         </h2>
                         <p className="text-lg text-slate-300 leading-relaxed">
-                            From the timeless elegance of marble to the resilient beauty of porcelain, discover collections curated to elevate your living spaces.
+                            From cement and CPVC/PVC to sanitary ware, granite, marble, and tiles—discover building and interior materials for every project.
                         </p>
                     </div>
                     <Link
@@ -75,7 +61,7 @@ export default function FeaturedCategories() {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
                 >
                     {CATEGORIES.map((category) => (
                         <motion.div key={category.id} variants={itemVariants}>
