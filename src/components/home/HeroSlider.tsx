@@ -84,7 +84,7 @@ export default function HeroSlider() {
                                 </p>
                                 <Link
                                     href={SLIDES[current].link}
-                                    className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full font-medium text-lg transition-all hover:gap-4 hover:shadow-lg hover:shadow-primary/30"
+                                    className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-full font-medium text-lg transition-all hover:gap-4 hover:shadow-lg hover:shadow-primary/30"
                                 >
                                     {SLIDES[current].cta}
                                     <ArrowRight className="w-5 h-5" />
