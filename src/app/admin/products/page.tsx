@@ -662,6 +662,8 @@ export default function AdminProductsPage() {
             }
 
             let imageIndex = 0;
+            let createdCount = 0;
+            let updatedCount = 0;
             const categoryByNameMutable = new Map(categories.map((c) => [c.name.toLowerCase().trim(), c.id]));
             const brandByNameMutable = new Map(brands.map((b) => [b.name.toLowerCase().trim(), b.id]));
             const total = parsed.products.length;
@@ -742,18 +744,9 @@ export default function AdminProductsPage() {
                     });
                 }
 
-                // 3. Check existing by productCode in parallel
-                const existingByCodeSnaps = await Promise.all(
-                    payloads.map(({ productCode }) =>
-                        productCode
-                            ? getDocs(query(collection(db, "products"), where("productCode", "==", productCode), limit(1)))
-                            : Promise.resolve({ empty: true, docs: [] } as { empty: boolean; docs: { ref: import("firebase/firestore").DocumentReference }[] })
-                    )
-                );
-                // 4. For rows not found by productCode, check by name+categoryId (in parallel)
+                // 3. Match existing only by name+categoryId (productCode is not unique; same code can be used for multiple products)
                 const existingByNameRefs = await Promise.all(
-                    payloads.map(async (item, i) => {
-                        if (!existingByCodeSnaps[i].empty) return null;
+                    payloads.map(async (item) => {
                         const snap = await getDocs(
                             query(collection(db, "products"), where("categoryId", "==", item.categoryId), limit(200))
                         );
@@ -762,16 +755,18 @@ export default function AdminProductsPage() {
                     })
                 );
 
-                // 5. Single batch write for this chunk
+                // 4. Single batch write for this chunk
                 const batch = writeBatch(db);
                 for (let i = 0; i < payloads.length; i++) {
-                    const existingRef = existingByCodeSnaps[i].empty ? existingByNameRefs[i] : existingByCodeSnaps[i].docs[0]?.ref;
+                    const existingRef = existingByNameRefs[i];
                     const { payload } = payloads[i];
                     if (existingRef) {
                         batch.update(existingRef, payload);
+                        updatedCount += 1;
                     } else {
                         const newRef = doc(collection(db, "products"));
                         batch.set(newRef, { ...payload, createdAt: serverTimestamp() });
+                        createdCount += 1;
                     }
                 }
                 await batch.commit();
@@ -779,7 +774,10 @@ export default function AdminProductsPage() {
                 toast.loading(`Importing... (${done}/${total})`, { id: toastId });
             }
 
-            toast.success(`${total} product(s) imported.`, { id: toastId });
+            const msg = updatedCount > 0
+                ? `${total} rows: ${createdCount} created, ${updatedCount} updated (matched by name+category).`
+                : `${total} product(s) imported.`;
+            toast.success(msg, { id: toastId });
             setBulkModalOpen(false);
             setBulkJsonText("");
             setBulkImageFiles([]);
