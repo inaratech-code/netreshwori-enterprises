@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Quote, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 
 const TESTIMONIALS = [
     {
@@ -88,19 +89,30 @@ export default function Testimonials() {
                         </AnimatePresence>
                     </div>
 
-                    <div className="flex justify-center gap-4 mt-8">
-                        <button
-                            onClick={prev}
-                            className="p-3 rounded-full border border-white/40 text-slate-300 hover:text-primary hover:border-primary transition-colors hover:bg-white/10"
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+                        <div className="flex gap-4">
+                            <button
+                                onClick={prev}
+                                className="p-3 rounded-full border border-white/40 text-slate-300 hover:text-primary hover:border-primary transition-colors hover:bg-white/10"
+                                aria-label="Previous testimonial"
+                            >
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
+                            <button
+                                onClick={next}
+                                className="p-3 rounded-full border border-white/40 text-slate-300 hover:text-primary hover:border-primary transition-colors hover:bg-white/10"
+                                aria-label="Next testimonial"
+                            >
+                                <ChevronRight className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <Link
+                            href="/contact"
+                            className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-full font-semibold transition-all hover:shadow-lg"
                         >
-                            <ChevronLeft className="w-6 h-6" />
-                        </button>
-                        <button
-                            onClick={next}
-                            className="p-3 rounded-full border border-white/40 text-slate-300 hover:text-primary hover:border-primary transition-colors hover:bg-white/10"
-                        >
-                            <ChevronRight className="w-6 h-6" />
-                        </button>
+                            <MessageCircle className="w-5 h-5" />
+                            Share your experience
+                        </Link>
                     </div>
                 </div>
             </div>
