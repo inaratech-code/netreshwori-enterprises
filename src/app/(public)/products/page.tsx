@@ -124,7 +124,7 @@ function ProductsContent() {
       const s = (p.size ?? "").trim();
       if (s) fromProducts.add(s);
     });
-    const combined = new Set([...SIZE_FILTER_OPTIONS, ...fromProducts]);
+    const combined = new Set([...SIZE_FILTER_OPTIONS, ...Array.from(fromProducts)]);
     return Array.from(combined).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
   }, [products]);
 
@@ -134,7 +134,7 @@ function ProductsContent() {
       const f = (p.finish ?? "").trim();
       if (f) fromProducts.add(f);
     });
-    const combined = new Set([...FINISH_FILTER_OPTIONS, ...fromProducts]);
+    const combined = new Set([...FINISH_FILTER_OPTIONS, ...Array.from(fromProducts)]);
     return Array.from(combined).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
   }, [products]);
 
