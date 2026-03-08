@@ -670,7 +670,7 @@ export default function AdminProductsPage() {
                 const chunk = parsed.products.slice(start, start + CHUNK_SIZE);
                 // 1. Resolve category and brand for each product in chunk (create if needed)
                 for (const p of chunk) {
-                    let categoryId = p.categoryId && categoryIds.has(p.categoryId)
+                    const categoryId = p.categoryId && categoryIds.has(p.categoryId)
                         ? p.categoryId
                         : (p.category?.trim() ? categoryByNameMutable.get(p.category.trim().toLowerCase()) : undefined);
                     if (p.category?.trim() && !categoryId) {
