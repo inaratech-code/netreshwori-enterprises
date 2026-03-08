@@ -48,7 +48,7 @@ export default function Testimonials() {
                     <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
                         Client <span className="text-primary">Testimonials</span>
                     </h2>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                    <p className="text-lg text-slate-300 max-w-2xl mx-auto">
                         Don&apos;t just take our word for it. Hear what our satisfied customers and partners have to say about our products and services.
                     </p>
                 </div>

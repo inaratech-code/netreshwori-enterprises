@@ -62,7 +62,7 @@ export default function ContactPage() {
                     <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">
                         Get in <span className="text-primary">Touch</span>
                     </h1>
-                    <p className="text-slate-600 text-sm max-w-xl mx-auto">
+                    <p className="text-slate-300 text-sm max-w-xl mx-auto">
                         Questions about products, pricing, or a custom quote? We’re here to help.
                     </p>
                 </header>

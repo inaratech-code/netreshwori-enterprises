@@ -101,7 +101,7 @@ export default function Navbar() {
                             href="tel:+9779864320452"
                             className={cn(
                                 "flex items-center gap-1.5 text-xs font-medium transition-colors",
-                                isScrolledOrNotHome ? "text-slate-600 hover:text-primary" : "text-white/90 hover:text-white"
+                                "text-white/90 hover:text-white"
                             )}
                         >
                             <Phone className="w-3 h-3" />
