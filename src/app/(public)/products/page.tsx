@@ -24,7 +24,7 @@ function ProductsContent() {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(categoryParam || null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedFinish, setSelectedFinish] = useState<string | null>(null);
@@ -83,13 +83,25 @@ function ProductsContent() {
     getBrands().then(setBrands);
   }, []);
 
+  // Resolve URL category param (can be category name from Explore Our Categories) to Firestore category id
   useEffect(() => {
+    if (!categoryParam.trim() || categories.length === 0) return;
+    const param = categoryParam.trim();
+    const byId = categories.find((c) => c.id === param);
+    const byName = categories.find((c) => c.name.trim().toLowerCase() === param.toLowerCase());
+    const resolvedId = byId?.id ?? byName?.id ?? null;
+    setSelectedCategoryId(resolvedId);
+  }, [categoryParam, categories]);
+
+  useEffect(() => {
+    // When URL has category param, wait for categories to load so we can resolve name → id before first load
+    if (categoryParam.trim() && categories.length === 0) return;
     setProducts([]);
     setLastDoc(null);
     setHasMore(true);
     loadFirstPage(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run when filters change only
-  }, [selectedCategoryId, selectedBrandId, selectedSize, selectedFinish]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run when filters/categories change
+  }, [selectedCategoryId, selectedBrandId, selectedSize, selectedFinish, categoryParam, categories]);
 
   useEffect(() => {
     const el = observerTarget.current;

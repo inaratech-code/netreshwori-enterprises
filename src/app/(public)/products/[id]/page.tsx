@@ -284,7 +284,7 @@ export default function ProductDetailPage() {
               <span>Loading more products...</span>
             </div>
           ) : moreProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {moreProducts.map((p) => {
                 const images = Array.isArray(p.images) ? p.images : (p as { image?: string }).image ? [(p as { image?: string }).image!] : [];
                 return (
