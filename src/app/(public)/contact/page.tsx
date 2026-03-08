@@ -3,7 +3,9 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { MapPin, Phone, Mail, MessageCircle, Send, CheckCircle2 } from "lucide-react";
+import { MapPin, Phone, Mail, MessageCircle, Send, CheckCircle2, Loader2 } from "lucide-react";
+import { createInquiry } from "@/lib/admin/firestore";
+import toast from "react-hot-toast";
 
 const OfficeMap = dynamic(() => import("@/components/contact/OfficeMap"), { ssr: false });
 
@@ -44,13 +46,38 @@ const contactCards = [
     },
 ];
 
+const SUBJECT_LABELS: Record<string, string> = {
+    general: "General inquiry",
+    wholesale: "Wholesale pricing",
+    support: "Product support",
+    other: "Other",
+};
+
 export default function ContactPage() {
     const [submitted, setSubmitted] = useState(false);
+    const [sending, setSending] = useState(false);
+    const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "general", message: "" });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSubmitted(true);
-        setTimeout(() => setSubmitted(false), 5000);
+        setSending(true);
+        try {
+            await createInquiry({
+                name: form.name.trim(),
+                email: form.email.trim(),
+                phone: form.phone.trim() || undefined,
+                subject: SUBJECT_LABELS[form.subject] || form.subject,
+                message: form.message.trim(),
+            });
+            setSubmitted(true);
+            setForm({ name: "", email: "", phone: "", subject: "general", message: "" });
+            toast.success("Message sent. We’ll get back to you shortly.");
+        } catch (err) {
+            console.error("Contact form error:", err);
+            toast.error("Failed to send message. Please try again or call/WhatsApp us.");
+        } finally {
+            setSending(false);
+        }
     };
 
     return (
@@ -147,6 +174,8 @@ export default function ContactPage() {
                                         type="text"
                                         required
                                         placeholder="Your name"
+                                        value={form.name}
+                                        onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                                     />
                                 </div>
@@ -160,6 +189,8 @@ export default function ContactPage() {
                                             type="email"
                                             required
                                             placeholder="you@example.com"
+                                            value={form.email}
+                                            onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
                                             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                                         />
                                     </div>
@@ -171,6 +202,8 @@ export default function ContactPage() {
                                             id="contact-phone"
                                             type="tel"
                                             placeholder="+977 ..."
+                                            value={form.phone}
+                                            onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
                                             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                                         />
                                     </div>
@@ -181,6 +214,8 @@ export default function ContactPage() {
                                     </label>
                                     <select
                                         id="contact-subject"
+                                        value={form.subject}
+                                        onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))}
                                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer"
                                     >
                                         <option value="general">General inquiry</option>
@@ -198,15 +233,18 @@ export default function ContactPage() {
                                         required
                                         rows={4}
                                         placeholder="How can we help?"
+                                        value={form.message}
+                                        onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
                                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
                                     />
                                 </div>
                                 <button
                                     type="submit"
-                                    className="mt-2 w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-lg transition-all flex items-center justify-center gap-2"
+                                    disabled={sending}
+                                    className="mt-2 w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
-                                    <Send className="w-5 h-5" aria-hidden />
-                                    Send message
+                                    {sending ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden /> : <Send className="w-5 h-5" aria-hidden />}
+                                    {sending ? "Sending..." : "Send message"}
                                 </button>
                             </form>
                         )}

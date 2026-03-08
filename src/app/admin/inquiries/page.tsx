@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { collection, query, orderBy, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Trash2, Phone, MessageCircle, CheckCircle, Clock } from "lucide-react";
+import { Trash2, Phone, MessageCircle, CheckCircle, Clock, RefreshCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAdminCache } from "../AdminCacheContext";
 
@@ -13,6 +13,7 @@ interface Inquiry {
     phone: string;
     email?: string;
     productId?: string;
+    subject?: string;
     message: string;
     status: "new" | "contacted";
     createdAt: number | string | Date;
@@ -85,9 +86,20 @@ export default function InquiriesPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Inquiries</h1>
-                <p className="text-muted-foreground mt-1">Manage customer inquiries and messages.</p>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Inquiries</h1>
+                    <p className="text-muted-foreground mt-1">Manage customer inquiries and messages.</p>
+                </div>
+                <button
+                    type="button"
+                    onClick={() => fetchInquiries(true)}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted transition-colors disabled:opacity-60"
+                >
+                    <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                    Refresh
+                </button>
             </div>
 
             <div className="rounded-xl border bg-card shadow overflow-hidden">
@@ -126,6 +138,7 @@ export default function InquiriesPage() {
                                             <div className="flex flex-col">
                                                 <span className="font-medium text-slate-900">{inquiry.name}</span>
                                                 {inquiry.email && <span className="text-xs text-slate-500">{inquiry.email}</span>}
+                                                {inquiry.subject && <span className="text-xs text-slate-500 mt-0.5">Subject: {inquiry.subject}</span>}
                                                 {inquiry.message && <span className="text-sm text-slate-600 mt-1 line-clamp-2 max-w-xs">{inquiry.message}</span>}
                                             </div>
                                         </td>

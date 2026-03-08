@@ -240,6 +240,25 @@ export async function getInquiries(): Promise<Inquiry[]> {
   const snap = await getDocs(query(inquiriesCol(), orderBy("createdAt", "desc")));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Inquiry));
 }
+export async function createInquiry(data: {
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+  subject?: string;
+}): Promise<string> {
+  const ref = await addDoc(inquiriesCol(), {
+    name: data.name,
+    email: data.email,
+    phone: data.phone ?? "",
+    message: data.message,
+    subject: data.subject ?? "",
+    productId: "", // required by Firestore rules; set when from product page
+    status: "new",
+    createdAt: serverTimestamp(),
+  });
+  return ref.id;
+}
 export async function updateInquiry(id: string, data: Partial<Inquiry>): Promise<void> {
   await updateDoc(doc(db, COLLECTIONS.inquiries, id), data);
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import "lenis/dist/lenis.css";
 import { Providers } from "@/components/auth/Providers";
@@ -38,6 +39,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <Providers>
             <LenisProvider>{children}</LenisProvider>
+            <Toaster position="top-center" />
           </Providers>
         </ThemeProvider>
       </body>
