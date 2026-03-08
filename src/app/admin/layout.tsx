@@ -100,13 +100,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="h-full flex flex-col pt-6 pb-4 overflow-hidden">
           <div className="px-4 mb-8 flex items-center justify-between gap-2 shrink-0">
             <Link href="/" className="flex items-center gap-3 min-w-0 group">
-              <span className="relative shrink-0 flex items-center justify-center w-14 h-14 rounded-full overflow-hidden bg-primary/10 ring-1 ring-border">
+              <span className="relative shrink-0 flex items-center justify-center w-14 h-14 rounded-full overflow-hidden bg-white ring-1 ring-border">
                 <Image
-                  src="/logo/LOGO.png"
-                  alt=""
+                  src="/logo/admin-logo.png"
+                  alt="Netreshwori"
                   width={96}
                   height={96}
                   className="w-11 h-11 object-contain"
+                  onError={(e) => { const t = e.target as HTMLImageElement; if (t) t.src = "/logo/LOGO.png"; }}
                 />
               </span>
               <span className="font-semibold text-lg tracking-tight truncate text-foreground group-hover:opacity-90 transition-opacity duration-200">
@@ -175,11 +176,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </span>
             <Link href="/" className="shrink-0 flex items-center h-11 transition-opacity duration-200 hover:opacity-90">
               <Image
-                src="/logo/LOGO.png"
+                src="/logo/admin-logo.png"
                 alt="Netreshwori"
                 width={140}
                 height={44}
                 className="h-11 w-auto object-contain"
+                onError={(e) => { const t = e.target as HTMLImageElement; if (t) t.src = "/logo/LOGO.png"; }}
               />
             </Link>
           </div>

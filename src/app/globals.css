@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Bosch Display – public site only (purchase from https://iframefonts.com/fonts/bosch-display-font/) */
+@font-face {
+  font-family: "Bosch Display";
+  src: url("/fonts/BoschDisplay-Regular.woff2") format("woff2"),
+       url("/fonts/BoschDisplay-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Public website uses Bosch Display; admin keeps default font */
+.font-bosch {
+  font-family: "Bosch Display", Georgia, "Times New Roman", serif;
+}
+
 @layer base {
   :root {
     --background: 220 10% 18%; /* dark mid-tone */
