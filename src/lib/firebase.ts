@@ -18,21 +18,15 @@ const hasConfig =
   firebaseConfig.projectId &&
   firebaseConfig.appId;
 
-// Placeholder config so build/prerender succeeds when env is not set (e.g. Vercel before env vars are added).
-// At runtime, set NEXT_PUBLIC_FIREBASE_* in Vercel (or .env.local locally) for real Firebase.
-const placeholderConfig = {
-  apiKey: "build-placeholder",
-  authDomain: "localhost",
-  projectId: "placeholder",
-  storageBucket: "placeholder",
-  messagingSenderId: "0",
-  appId: "1:0:web:0",
-};
-
-const app: FirebaseApp =
-  !getApps().length
-    ? initializeApp(hasConfig ? firebaseConfig : placeholderConfig)
-    : getApp();
+const app: FirebaseApp = !getApps().length && hasConfig
+  ? initializeApp(firebaseConfig)
+  : getApps().length
+    ? getApp()
+    : (() => {
+        throw new Error(
+          "Missing Firebase env. Copy .env.example to .env.local and add your Firebase config. See FIREBASE_SETUP.md"
+        );
+      })();
 
 const auth = getAuth(app);
 const db = getFirestore(app);
