@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { Search, SlidersHorizontal, Loader2, ChevronDown } from "lucide-react";
+import { Search, SlidersHorizontal, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import ProductCard from "@/components/product/ProductCard";
 import ProductCardSkeleton from "@/components/product/ProductCardSkeleton";
 import { getProductsPaginated, getCategories, getBrands } from "@/lib/admin/firestore";
@@ -30,6 +30,7 @@ function ProductsContent() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedFinish, setSelectedFinish] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const debouncedSearch = useDebounce(searchTerm, 300);
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -206,73 +207,169 @@ function ProductsContent() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <aside className="w-full lg:w-64 shrink-0">
-            <div className="bg-card p-6 rounded-2xl border border-border sticky top-24 shadow-sm">
-              <h2 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
-                <SlidersHorizontal className="w-5 h-5 text-primary" />
-                Filters
-              </h2>
-              <div className="mb-8">
-                <h3 className="font-semibold text-foreground mb-4">Category</h3>
-                <div className="relative">
-                  <select
-                    value={selectedCategoryId ?? ""}
-                    onChange={(e) => setSelectedCategoryId(e.target.value || null)}
-                    className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
-                  >
-                    <option value="">All</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+            {/* Mobile: single "Filters" dropdown button that expands to show filter panel */}
+            <div className="lg:hidden">
+              <button
+                type="button"
+                onClick={() => setMobileFiltersOpen((o) => !o)}
+                className="w-full flex items-center justify-between gap-2 bg-card border border-border rounded-2xl px-4 py-3 shadow-sm text-left hover:bg-muted/50 transition-colors"
+                aria-expanded={mobileFiltersOpen}
+                aria-controls="mobile-filters-panel"
+              >
+                <span className="flex items-center gap-2 text-lg font-bold text-foreground">
+                  <SlidersHorizontal className="w-5 h-5 text-primary" />
+                  Filters
+                </span>
+                {mobileFiltersOpen ? (
+                  <ChevronUp className="w-5 h-5 text-muted-foreground shrink-0" aria-hidden />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-muted-foreground shrink-0" aria-hidden />
+                )}
+              </button>
+              <div
+                id="mobile-filters-panel"
+                className={`overflow-hidden transition-[height] duration-200 ${mobileFiltersOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}
+                role="region"
+                aria-label="Filter options"
+              >
+                <div className="bg-card mt-2 p-4 rounded-2xl border border-border shadow-sm space-y-6">
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-2">Category</h3>
+                    <div className="relative">
+                      <select
+                        value={selectedCategoryId ?? ""}
+                        onChange={(e) => setSelectedCategoryId(e.target.value || null)}
+                        className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
+                      >
+                        <option value="">All</option>
+                        {categories.map((cat) => (
+                          <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-2">Brand name</h3>
+                    <div className="relative">
+                      <select
+                        value={selectedBrandId ?? ""}
+                        onChange={(e) => setSelectedBrandId(e.target.value || null)}
+                        className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
+                      >
+                        <option value="">All</option>
+                        {brandFilterOptions.map((b) => (
+                          <option key={b.id} value={b.id}>{b.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-2">Size</h3>
+                    <div className="relative">
+                      <select
+                        value={selectedSize ?? ""}
+                        onChange={(e) => setSelectedSize(e.target.value || null)}
+                        className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
+                      >
+                        <option value="">All</option>
+                        {sizeFilterOptions.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-2">Finish</h3>
+                    <div className="relative">
+                      <select
+                        value={selectedFinish ?? ""}
+                        onChange={(e) => setSelectedFinish(e.target.value || null)}
+                        className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
+                      >
+                        <option value="">All</option>
+                        {finishFilterOptions.map((f) => (
+                          <option key={f} value={f}>{f}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="mb-8">
-                <h3 className="font-semibold text-foreground mb-4">Brand name</h3>
-                <div className="relative">
-                  <select
-                    value={selectedBrandId ?? ""}
-                    onChange={(e) => setSelectedBrandId(e.target.value || null)}
-                    className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
-                  >
-                    <option value="">All</option>
-                    {brandFilterOptions.map((b) => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+            </div>
+            {/* Desktop: always-visible sidebar */}
+            <div className="hidden lg:block">
+              <div className="bg-card p-6 rounded-2xl border border-border sticky top-24 shadow-sm">
+                <h2 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
+                  <SlidersHorizontal className="w-5 h-5 text-primary" />
+                  Filters
+                </h2>
+                <div className="mb-8">
+                  <h3 className="font-semibold text-foreground mb-4">Category</h3>
+                  <div className="relative">
+                    <select
+                      value={selectedCategoryId ?? ""}
+                      onChange={(e) => setSelectedCategoryId(e.target.value || null)}
+                      className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
+                    >
+                      <option value="">All</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+                  </div>
                 </div>
-              </div>
-              <div className="mb-8">
-                <h3 className="font-semibold text-foreground mb-4">Size</h3>
-                <div className="relative">
-                  <select
-                    value={selectedSize ?? ""}
-                    onChange={(e) => setSelectedSize(e.target.value || null)}
-                    className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
-                  >
-                    <option value="">All</option>
-                    {sizeFilterOptions.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+                <div className="mb-8">
+                  <h3 className="font-semibold text-foreground mb-4">Brand name</h3>
+                  <div className="relative">
+                    <select
+                      value={selectedBrandId ?? ""}
+                      onChange={(e) => setSelectedBrandId(e.target.value || null)}
+                      className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
+                    >
+                      <option value="">All</option>
+                      {brandFilterOptions.map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-4">Finish</h3>
-                <div className="relative">
-                  <select
-                    value={selectedFinish ?? ""}
-                    onChange={(e) => setSelectedFinish(e.target.value || null)}
-                    className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
-                  >
-                    <option value="">All</option>
-                    {finishFilterOptions.map((f) => (
-                      <option key={f} value={f}>{f}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+                <div className="mb-8">
+                  <h3 className="font-semibold text-foreground mb-4">Size</h3>
+                  <div className="relative">
+                    <select
+                      value={selectedSize ?? ""}
+                      onChange={(e) => setSelectedSize(e.target.value || null)}
+                      className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
+                    >
+                      <option value="">All</option>
+                      {sizeFilterOptions.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-4">Finish</h3>
+                  <div className="relative">
+                    <select
+                      value={selectedFinish ?? ""}
+                      onChange={(e) => setSelectedFinish(e.target.value || null)}
+                      className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
+                    >
+                      <option value="">All</option>
+                      {finishFilterOptions.map((f) => (
+                        <option key={f} value={f}>{f}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
+                  </div>
                 </div>
               </div>
             </div>

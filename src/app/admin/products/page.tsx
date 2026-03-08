@@ -1204,7 +1204,7 @@ export default function AdminProductsPage() {
                                         type="button"
                                         onClick={fetchFromGoogleSheet}
                                         disabled={bulkFetchingSheet || !bulkSheetUrl.trim()}
-                                        className="px-4 py-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 font-medium text-sm disabled:opacity-50 flex items-center gap-2"
+                                        className="px-4 py-2 rounded-xl bg-slate-200 text-slate-900 hover:bg-slate-300 font-medium text-sm disabled:opacity-50 flex items-center gap-2 transition-colors"
                                     >
                                         {bulkFetchingSheet ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                                         Fetch from Sheet
@@ -1212,7 +1212,7 @@ export default function AdminProductsPage() {
                                 </div>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                                <label className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-medium cursor-pointer">
+                                <label className="inline-flex items-center gap-2 px-4 py-2 bg-slate-200 text-slate-900 hover:bg-slate-300 rounded-xl text-sm font-medium cursor-pointer transition-colors">
                                     <Upload className="w-4 h-4" />
                                     Choose CSV or JSON file
                                     <input type="file" accept=".csv,.json,text/csv,application/json" className="hidden" onChange={handleBulkFile} />
@@ -1227,7 +1227,7 @@ export default function AdminProductsPage() {
                                         a.click();
                                         URL.revokeObjectURL(a.href);
                                     }}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl text-sm font-medium hover:bg-primary/20"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-200 text-slate-900 hover:bg-slate-300 rounded-xl text-sm font-medium transition-colors"
                                 >
                                     JSON template
                                 </button>
@@ -1242,7 +1242,7 @@ export default function AdminProductsPage() {
                                         a.click();
                                         URL.revokeObjectURL(a.href);
                                     }}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl text-sm font-medium hover:bg-primary/20"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-200 text-slate-900 hover:bg-slate-300 rounded-xl text-sm font-medium transition-colors"
                                 >
                                     CSV template
                                 </button>
