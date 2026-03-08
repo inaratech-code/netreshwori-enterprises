@@ -177,7 +177,7 @@ function ProductsContent() {
   }, [filteredBySearch, categories, brands]);
 
   return (
-    <div className="bg-muted/30 min-h-screen pt-24 pb-16">
+    <div className="bg-brand-gradient min-h-screen pt-24 pb-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4 tracking-tight">Our Collection</h1>
@@ -363,7 +363,7 @@ function ProductsContent() {
 
 function ProductsFallback() {
   return (
-    <div className="bg-muted/30 min-h-screen pt-24 pb-16">
+    <div className="bg-brand-gradient min-h-screen pt-24 pb-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <Skeleton className="h-10 w-64 mb-4" />
         <Skeleton className="h-5 w-96 mb-12" />

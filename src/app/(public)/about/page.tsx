@@ -21,7 +21,7 @@ const FOUNDERS = [
 
 export default function AboutPage() {
     return (
-        <div className="bg-slate-50 min-h-screen pt-24 pb-16">
+        <div className="bg-brand-gradient min-h-screen pt-24 pb-16">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}

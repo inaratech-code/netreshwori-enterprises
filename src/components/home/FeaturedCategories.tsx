@@ -50,7 +50,7 @@ const itemVariants: Variants = {
 
 export default function FeaturedCategories() {
     return (
-        <section id="categories" className="py-24 bg-slate-50">
+        <section id="categories" className="py-24 bg-brand-gradient">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
                     <div className="max-w-2xl">

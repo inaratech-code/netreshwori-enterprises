@@ -50,7 +50,7 @@ export default function DealershipPartners() {
     if (DEALERSHIP_PARTNERS.length === 0) return null;
 
     return (
-        <section id="dealership-partners" className="py-16 md:py-20 bg-white border-y border-slate-100 overflow-hidden">
+        <section id="dealership-partners" className="py-16 md:py-20 bg-brand-gradient border-y border-slate-200/60 overflow-hidden">
             <div className="container mx-auto px-4">
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}

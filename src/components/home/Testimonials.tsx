@@ -42,7 +42,7 @@ export default function Testimonials() {
     const prev = () => setCurrent((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
 
     return (
-        <section id="testimonials" className="py-24 bg-white overflow-hidden">
+        <section id="testimonials" className="py-24 bg-brand-gradient overflow-hidden">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
