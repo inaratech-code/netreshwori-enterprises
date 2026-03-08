@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { DEALERSHIP_PARTNERS } from "@/data/partners";
 
@@ -34,19 +34,6 @@ function PartnerLogo({ partner }: { partner: { name: string; logo: string; url?:
 }
 
 export default function DealershipPartners() {
-    const scrollRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        const el = scrollRef.current;
-        if (!el) return;
-        const onWheel = (e: WheelEvent) => {
-            if (e.deltaY !== 0) {
-                el.scrollLeft += e.deltaY;
-                e.preventDefault();
-            }
-        };
-        el.addEventListener("wheel", onWheel, { passive: false });
-        return () => el.removeEventListener("wheel", onWheel);
-    }, []);
     if (DEALERSHIP_PARTNERS.length === 0) return null;
 
     return (
@@ -67,11 +54,8 @@ export default function DealershipPartners() {
                     </p>
                 </motion.div>
             </div>
-            <div
-                ref={scrollRef}
-                className="relative overflow-x-auto overflow-y-hidden py-4 scroll-smooth scrollbar-hide"
-                style={{ scrollbarGutter: "stable" }}
-            >
+            {/* Clip to viewport so only the looping marquee is visible — no scroll, no blank space after Prime */}
+            <div className="relative overflow-x-hidden overflow-y-hidden py-4">
                 <motion.div
                     className="flex shrink-0 gap-12 md:gap-16 items-center w-max"
                     animate={{ x: [0, "-50%"] }}
