@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo, startTransition, useCallback } from "react";
 import { Package, Plus, Edit2, Trash2, Search, Loader2, ImagePlus, X, Upload, FileJson, Download, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { db, storage } from "@/lib/firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, limit, startAfter, where } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, limit, startAfter, where, writeBatch } from "firebase/firestore";
 import type { DocumentSnapshot } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL, type UploadMetadata } from "firebase/storage";
 import toast from "react-hot-toast";
@@ -637,6 +637,7 @@ export default function AdminProductsPage() {
 
         setBulkImporting(true);
         const toastId = toast.loading("Importing products...");
+        const CHUNK_SIZE = 50; // Process in chunks to avoid timeouts; Firestore batch max 500
         try {
             let imageUrls: string[] = [];
             if (bulkImageFiles.length > 0) {
@@ -663,94 +664,122 @@ export default function AdminProductsPage() {
             let imageIndex = 0;
             const categoryByNameMutable = new Map(categories.map((c) => [c.name.toLowerCase().trim(), c.id]));
             const brandByNameMutable = new Map(brands.map((b) => [b.name.toLowerCase().trim(), b.id]));
-            for (const p of parsed.products) {
-                let categoryId = p.categoryId && categoryIds.has(p.categoryId)
-                    ? p.categoryId
-                    : (p.category?.trim() ? categoryByNameMutable.get(p.category.trim().toLowerCase()) : undefined);
-                if (p.category?.trim() && !categoryId) {
-                    const categoryName = p.category.trim();
-                    const catRef = await addDoc(collection(db, "categories"), {
-                        name: categoryName,
-                        description: "",
-                        createdAt: serverTimestamp(),
-                    });
-                    categoryByNameMutable.set(categoryName.toLowerCase(), catRef.id);
-                    categoryId = catRef.id;
-                }
-                let brandId = p.brandId ?? (p.brand ? brandByNameMutable.get(p.brand.trim().toLowerCase()) : undefined) ?? undefined;
-                if (p.brand?.trim() && !brandId && partnerBrandNamesLower.has(p.brand.trim().toLowerCase())) {
-                    const brandRef = await addDoc(collection(db, "brands"), {
-                        name: p.brand.trim(),
-                        logo: "",
-                        description: "",
-                        status: "active",
-                        createdAt: serverTimestamp(),
-                    });
-                    brandByNameMutable.set(p.brand.trim().toLowerCase(), brandRef.id);
-                    brandId = brandRef.id;
-                }
-                let productImages: string[] = [];
-                const singleImage = (p as { image?: string; imageUrl?: string; image_url?: string }).image?.trim()
-                    || (p as { imageUrl?: string }).imageUrl?.trim()
-                    || (p as { image_url?: string }).image_url?.trim();
-                if (singleImage) {
-                    productImages = [singleImage];
-                } else if (p.images) {
-                    productImages = Array.isArray(p.images)
-                        ? p.images.filter((u) => typeof u === "string" && u.trim())
-                        : String(p.images)
-                            .split(",")
-                            .map((u) => u.trim())
-                            .filter(Boolean);
-                } else if (p.imageUrls?.length) {
-                    productImages = p.imageUrls;
-                } else {
-                    const imageCount = Math.max(0, p.imageCount ?? 1);
-                    productImages = imageUrls.slice(imageIndex, imageIndex + imageCount).filter(Boolean);
-                    imageIndex += imageCount;
-                }
+            const total = parsed.products.length;
 
-                const productCode = (p.productCode || "").trim();
-                const productNameFromCsv = (p.name ?? "").trim();
-                const payload = {
-                    productCode: productCode || undefined,
-                    name: productNameFromCsv,
-                    brandId: brandId || undefined,
-                    categoryId,
-                    size: (p.size || "").trim() || "",
-                    finish: (p.finish || "").trim() || "",
-                    description: "",
-                    images: productImages,
-                    featured: false,
-                    status: "active",
-                };
-
-                if (productCode) {
-                    const existingSnap = await getDocs(
-                        query(collection(db, "products"), where("productCode", "==", productCode), limit(1))
-                    );
-                    if (!existingSnap.empty) {
-                        await updateDoc(existingSnap.docs[0].ref, payload);
-                        continue;
+            for (let start = 0; start < total; start += CHUNK_SIZE) {
+                const chunk = parsed.products.slice(start, start + CHUNK_SIZE);
+                // 1. Resolve category and brand for each product in chunk (create if needed)
+                for (const p of chunk) {
+                    let categoryId = p.categoryId && categoryIds.has(p.categoryId)
+                        ? p.categoryId
+                        : (p.category?.trim() ? categoryByNameMutable.get(p.category.trim().toLowerCase()) : undefined);
+                    if (p.category?.trim() && !categoryId) {
+                        const categoryName = p.category.trim();
+                        const catRef = await addDoc(collection(db, "categories"), {
+                            name: categoryName,
+                            description: "",
+                            createdAt: serverTimestamp(),
+                        });
+                        categoryByNameMutable.set(categoryName.toLowerCase(), catRef.id);
+                        categoryIds.add(catRef.id);
+                    }
+                    let brandId = p.brandId ?? (p.brand ? brandByNameMutable.get(p.brand.trim().toLowerCase()) : undefined) ?? undefined;
+                    if (p.brand?.trim() && !brandId && partnerBrandNamesLower.has(p.brand.trim().toLowerCase())) {
+                        const brandRef = await addDoc(collection(db, "brands"), {
+                            name: p.brand.trim(),
+                            logo: "",
+                            description: "",
+                            status: "active",
+                            createdAt: serverTimestamp(),
+                        });
+                        brandByNameMutable.set(p.brand.trim().toLowerCase(), brandRef.id);
+                        brandId = brandRef.id;
                     }
                 }
-                // Fallback: match by name + category (e.g. when using company codes that were added later)
-                const byCategorySnap = await getDocs(
-                    query(collection(db, "products"), where("categoryId", "==", categoryId), limit(200))
-                );
-                const sameName = byCategorySnap.docs.filter(
-                    (d) => (d.data().name as string)?.trim() === productNameFromCsv
-                );
-                if (sameName.length === 1) {
-                    await updateDoc(sameName[0].ref, payload);
-                    continue;
+
+                // 2. Build payloads and resolve existing refs in parallel for this chunk
+                const payloads: Array<{ payload: Record<string, unknown>; productCode: string; productName: string; categoryId: string }> = [];
+                for (const p of chunk) {
+                    const categoryId = p.categoryId && categoryIds.has(p.categoryId)
+                        ? p.categoryId
+                        : (p.category?.trim() ? categoryByNameMutable.get(p.category.trim().toLowerCase()) : undefined)!;
+                    const brandId = p.brandId ?? (p.brand ? brandByNameMutable.get(p.brand.trim().toLowerCase()) : undefined) ?? undefined;
+                    let productImages: string[] = [];
+                    const singleImage = (p as { image?: string; imageUrl?: string; image_url?: string }).image?.trim()
+                        || (p as { imageUrl?: string }).imageUrl?.trim()
+                        || (p as { image_url?: string }).image_url?.trim();
+                    if (singleImage) {
+                        productImages = [singleImage];
+                    } else if (p.images) {
+                        productImages = Array.isArray(p.images)
+                            ? p.images.filter((u) => typeof u === "string" && u.trim())
+                            : String(p.images).split(",").map((u) => u.trim()).filter(Boolean);
+                    } else if (p.imageUrls?.length) {
+                        productImages = p.imageUrls;
+                    } else {
+                        const imageCount = Math.max(0, p.imageCount ?? 1);
+                        productImages = imageUrls.slice(imageIndex, imageIndex + imageCount).filter(Boolean);
+                        imageIndex += imageCount;
+                    }
+                    const productCode = (p.productCode || "").trim();
+                    const productNameFromCsv = (p.name ?? "").trim();
+                    payloads.push({
+                        productCode,
+                        productName: productNameFromCsv,
+                        categoryId,
+                        payload: {
+                            productCode: productCode || undefined,
+                            name: productNameFromCsv,
+                            brandId: brandId || undefined,
+                            categoryId,
+                            size: (p.size || "").trim() || "",
+                            finish: (p.finish || "").trim() || "",
+                            description: "",
+                            images: productImages,
+                            featured: false,
+                            status: "active",
+                        },
+                    });
                 }
-                await addDoc(collection(db, "products"), {
-                    ...payload,
-                    createdAt: serverTimestamp(),
-                });
+
+                // 3. Check existing by productCode in parallel
+                const existingByCodeSnaps = await Promise.all(
+                    payloads.map(({ productCode }) =>
+                        productCode
+                            ? getDocs(query(collection(db, "products"), where("productCode", "==", productCode), limit(1)))
+                            : Promise.resolve({ empty: true, docs: [] } as { empty: boolean; docs: { ref: import("firebase/firestore").DocumentReference }[] })
+                    )
+                );
+                // 4. For rows not found by productCode, check by name+categoryId (in parallel)
+                const existingByNameRefs = await Promise.all(
+                    payloads.map(async (item, i) => {
+                        if (!existingByCodeSnaps[i].empty) return null;
+                        const snap = await getDocs(
+                            query(collection(db, "products"), where("categoryId", "==", item.categoryId), limit(200))
+                        );
+                        const match = snap.docs.find((d) => (d.data().name as string)?.trim() === item.productName);
+                        return match?.ref ?? null;
+                    })
+                );
+
+                // 5. Single batch write for this chunk
+                const batch = writeBatch(db);
+                for (let i = 0; i < payloads.length; i++) {
+                    const existingRef = existingByCodeSnaps[i].empty ? existingByNameRefs[i] : existingByCodeSnaps[i].docs[0]?.ref;
+                    const { payload } = payloads[i];
+                    if (existingRef) {
+                        batch.update(existingRef, payload);
+                    } else {
+                        const newRef = doc(collection(db, "products"));
+                        batch.set(newRef, { ...payload, createdAt: serverTimestamp() });
+                    }
+                }
+                await batch.commit();
+                const done = Math.min(start + CHUNK_SIZE, total);
+                toast.loading(`Importing... (${done}/${total})`, { id: toastId });
             }
-            toast.success(`${parsed.products.length} product(s) imported.`, { id: toastId });
+
+            toast.success(`${total} product(s) imported.`, { id: toastId });
             setBulkModalOpen(false);
             setBulkJsonText("");
             setBulkImageFiles([]);
@@ -798,6 +827,11 @@ export default function AdminProductsPage() {
         const file = e.target.files?.[0];
         if (!file) return;
         const isCsv = file.name.toLowerCase().endsWith(".csv") || file.type === "text/csv";
+        if (file.size > 10 * 1024 * 1024) {
+            setBulkError("File is very large (>10 MB). Use a smaller CSV or paste JSON directly.");
+            e.target.value = "";
+            return;
+        }
         const reader = new FileReader();
         reader.onload = () => {
             const text = String(reader.result ?? "");
@@ -806,6 +840,9 @@ export default function AdminProductsPage() {
                     const { products } = parseCsvToProducts(text);
                     setBulkJsonText(JSON.stringify({ products }, null, 2));
                     setBulkError("");
+                    if (products.length > 100) {
+                        toast.success(`${products.length} products loaded. Import runs in chunks; wait for "Importing... (n/n)" to finish.`);
+                    }
                 } catch {
                     setBulkError("Invalid CSV. Use headers: productCode, name, category, brand, size, finish, image (or images).");
                 }
@@ -813,7 +850,7 @@ export default function AdminProductsPage() {
                 setBulkJsonText(text);
             }
         };
-        reader.readAsText(file);
+        reader.readAsText(file, "UTF-8");
         e.target.value = "";
     };
 
