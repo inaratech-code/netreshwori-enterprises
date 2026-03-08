@@ -15,6 +15,7 @@ import {
   serverTimestamp,
   type QueryConstraint,
   type DocumentSnapshot,
+  type Query,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { Brand, Category, Product, Inquiry, Testimonial, AnalyticsEvent, Settings, MediaItem } from "./types";
@@ -252,7 +253,7 @@ export async function deleteAllProducts(): Promise<number> {
   let totalDeleted = 0;
   let last: DocumentSnapshot | null = null;
   for (;;) {
-    const q = last
+    const q: Query = last
       ? query(productsCol(), orderBy("createdAt", "desc"), limit(BATCH_SIZE), startAfter(last))
       : query(productsCol(), orderBy("createdAt", "desc"), limit(BATCH_SIZE));
     const snap = await getDocs(q);
