@@ -51,9 +51,13 @@ function parseCSV(text: string): string[][] {
   return rows;
 }
 
+/** Maps CSV header (lowercase, no spaces) to product field. "name" = product name from CSV (not brand). */
 const CSV_HEADER_KEY_MAP: Record<string, string> = {
   productcode: "productCode",
+  "product_code": "productCode",
   name: "name",
+  productname: "name",
+  "product_name": "name",
   category: "category",
   brand: "brand",
   size: "size",

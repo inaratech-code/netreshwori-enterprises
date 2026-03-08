@@ -711,9 +711,10 @@ export default function AdminProductsPage() {
                 }
 
                 const productCode = (p.productCode || "").trim();
+                const productNameFromCsv = (p.name ?? "").trim();
                 const payload = {
                     productCode: productCode || undefined,
-                    name: p.name.trim(),
+                    name: productNameFromCsv,
                     brandId: brandId || undefined,
                     categoryId,
                     size: (p.size || "").trim() || "",
@@ -724,7 +725,6 @@ export default function AdminProductsPage() {
                     status: "active",
                 };
 
-                const productName = p.name.trim();
                 if (productCode) {
                     const existingSnap = await getDocs(
                         query(collection(db, "products"), where("productCode", "==", productCode), limit(1))
@@ -739,7 +739,7 @@ export default function AdminProductsPage() {
                     query(collection(db, "products"), where("categoryId", "==", categoryId), limit(200))
                 );
                 const sameName = byCategorySnap.docs.filter(
-                    (d) => (d.data().name as string)?.trim() === productName
+                    (d) => (d.data().name as string)?.trim() === productNameFromCsv
                 );
                 if (sameName.length === 1) {
                     await updateDoc(sameName[0].ref, payload);
@@ -1014,8 +1014,8 @@ export default function AdminProductsPage() {
                                     <input type="text" value={form.productCode ?? ""} onChange={e => setForm({ ...form, productCode: e.target.value })} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900" placeholder="e.g. KAJ-001" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">Product Name *</label>
-                                    <input type="text" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900" placeholder="e.g. Marble Floor Tile" />
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">Product Name * (exact from CSV &quot;name&quot; column, not brand)</label>
+                                    <input type="text" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900" placeholder="e.g. Rockstrong, ball valve (product name from CSV)" />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
