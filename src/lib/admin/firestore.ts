@@ -50,6 +50,18 @@ export async function deleteBrand(id: string): Promise<void> {
   await deleteDoc(doc(db, COLLECTIONS.brands, id));
 }
 
+/** Returns product count per brand id (brandId -> count). */
+export async function getProductCountsByBrandIds(brandIds: string[]): Promise<Record<string, number>> {
+  const counts: Record<string, number> = {};
+  await Promise.all(
+    brandIds.map(async (id) => {
+      const snap = await getDocs(query(productsCol(), where("brandId", "==", id)));
+      counts[id] = snap.size;
+    })
+  );
+  return counts;
+}
+
 // ---- Categories ----
 export const categoriesCol = () => collection(db, COLLECTIONS.categories);
 export async function getCategories(): Promise<Category[]> {
@@ -289,15 +301,19 @@ export async function logAnalyticsEvent(data: Omit<AnalyticsEvent, "id">): Promi
   await addDoc(analyticsCol(), { ...data, timestamp: serverTimestamp() });
 }
 export async function getAnalyticsEvents(dateFrom: string, dateTo: string, maxDocs = 2000): Promise<AnalyticsEvent[]> {
-  const q = query(
-    analyticsCol(),
-    where("date", ">=", dateFrom),
-    where("date", "<=", dateTo),
-    orderBy("date", "asc"),
-    limit(maxDocs)
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as AnalyticsEvent));
+  try {
+    const q = query(
+      analyticsCol(),
+      where("date", ">=", dateFrom),
+      limit(maxDocs)
+    );
+    const snap = await getDocs(q);
+    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as AnalyticsEvent));
+    return list.filter((e) => e.date <= dateTo).sort((a, b) => a.date.localeCompare(b.date));
+  } catch (err) {
+    console.warn("getAnalyticsEvents failed (index or permissions):", err);
+    return [];
+  }
 }
 
 // ---- Settings (single doc) ----

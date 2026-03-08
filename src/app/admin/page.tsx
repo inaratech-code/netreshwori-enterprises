@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Users, Eye, MessageSquare, Calendar, Package, Building2, Star, Plus, ImageIcon, Inbox } from "lucide-react";
-import { collection, query, where, limit, getDocs, getDoc, doc } from "firebase/firestore";
+import { collection, query, limit, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { getBrands } from "@/lib/admin/firestore";
+import { getBrands, getAnalyticsEvents, getProduct } from "@/lib/admin/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -84,13 +84,7 @@ export default function AdminDashboardPage() {
         const thirtyDaysAgoDateStr = thirtyDaysAgo.toISOString().split("T")[0];
         const todayDateStr = now.toISOString().split("T")[0];
 
-        const eventsSnapshot = await getDocs(
-          query(
-            collection(db, "analytics_events"),
-            where("date", ">=", thirtyDaysAgoDateStr),
-            limit(2000)
-          )
-        );
+        const events = await getAnalyticsEvents(thirtyDaysAgoDateStr, todayDateStr);
         if (cancelled) return;
 
         let totalVisitors = 0;
@@ -107,16 +101,17 @@ export default function AdminDashboardPage() {
         }
         for (let i = 0; i < 24; i++) hoursMap[`${i}:00`] = 0;
 
-        eventsSnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          if (data.type === "page_view") {
+        events.forEach((e) => {
+          const dateStr = typeof e.date === "string" ? e.date : "";
+          const hour = typeof e.hour === "number" && e.hour >= 0 && e.hour < 24 ? e.hour : null;
+          if (e.type === "page_view") {
             totalVisitors++;
-            if (data.date === todayDateStr) todayVisitors++;
-            if (visitorsMap[data.date] !== undefined) visitorsMap[data.date]++;
-            hoursMap[`${data.hour}:00`]++;
-          } else if (data.type === "product_view") {
+            if (dateStr === todayDateStr) todayVisitors++;
+            if (dateStr && visitorsMap[dateStr] !== undefined) visitorsMap[dateStr]++;
+            if (hour !== null) hoursMap[`${hour}:00`]++;
+          } else if (e.type === "product_view") {
             totalViews++;
-            if (data.productId) productViewsMap[data.productId] = (productViewsMap[data.productId] || 0) + 1;
+            if (e.productId) productViewsMap[e.productId] = (productViewsMap[e.productId] || 0) + 1;
           }
         });
 
@@ -128,8 +123,8 @@ export default function AdminDashboardPage() {
           const productNames: Record<string, string> = {};
           await Promise.all(
             topProductEntries.map(([id]) =>
-              getDoc(doc(db, "products", id)).then((snap) => {
-                if (snap.exists()) productNames[id] = snap.data().name || "Unknown";
+              getProduct(id).then((p) => {
+                if (p) productNames[id] = p.name || "Unknown";
               })
             )
           );
@@ -148,14 +143,18 @@ export default function AdminDashboardPage() {
           totalViews,
         }));
         setChartData({
-          visitorsByDate: Object.entries(visitorsMap).map(([date, count]) => ({ date, count })),
-          busyHours: Object.entries(hoursMap).map(([hour, count]) => ({ hour, count })),
+          visitorsByDate: Object.entries(visitorsMap)
+            .map(([date, count]) => ({ date, count }))
+            .sort((a, b) => a.date.localeCompare(b.date)),
+          busyHours: Object.entries(hoursMap)
+            .map(([hour, count]) => ({ hour, count }))
+            .sort((a, b) => parseInt(a.hour, 10) - parseInt(b.hour, 10)),
           topProducts,
         });
-        setChartsReady(true);
       } catch (e) {
+        console.error("Dashboard analytics:", e);
+      } finally {
         if (!cancelled) setChartsReady(true);
-        console.error(e);
       }
     }
 

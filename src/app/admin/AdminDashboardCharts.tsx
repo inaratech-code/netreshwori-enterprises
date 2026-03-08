@@ -19,7 +19,17 @@ interface ChartData {
     topProducts: { id: string; name: string; views: number }[];
 }
 
-export default function AdminDashboardCharts({ chartData }: { chartData: ChartData }) {
+const emptyChartData: ChartData = {
+    visitorsByDate: [],
+    busyHours: [],
+    topProducts: [],
+};
+
+export default function AdminDashboardCharts({ chartData }: { chartData?: ChartData | null }) {
+    const data = chartData ?? emptyChartData;
+    const visitorsByDate = data.visitorsByDate ?? [];
+    const busyHours = data.busyHours ?? [];
+    const topProducts = data.topProducts ?? [];
     return (
         <>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
@@ -27,7 +37,7 @@ export default function AdminDashboardCharts({ chartData }: { chartData: ChartDa
                     <h2 className="text-lg font-bold text-slate-900 mb-6">Visitors (Last 30 Days)</h2>
                     <div className="h-72">
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={chartData.visitorsByDate}>
+                            <LineChart data={visitorsByDate}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                 <XAxis dataKey="date" tick={{ fontSize: 12 }} tickMargin={10} minTickGap={30} stroke="#94a3b8" />
                                 <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
@@ -43,7 +53,7 @@ export default function AdminDashboardCharts({ chartData }: { chartData: ChartDa
                     <h2 className="text-lg font-bold text-slate-900 mb-6">Busy Hours (24H Format)</h2>
                     <div className="h-72">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData.busyHours}>
+                            <BarChart data={busyHours}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                 <XAxis dataKey="hour" tick={{ fontSize: 12 }} tickMargin={10} minTickGap={20} stroke="#94a3b8" />
                                 <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
@@ -70,8 +80,8 @@ export default function AdminDashboardCharts({ chartData }: { chartData: ChartDa
                             </tr>
                         </thead>
                         <tbody>
-                            {chartData.topProducts.length > 0 ? (
-                                chartData.topProducts.map((product) => (
+                            {topProducts.length > 0 ? (
+                                topProducts.map((product) => (
                                     <tr key={product.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                                         <td className="p-4 text-slate-900 font-medium">{product.name}</td>
                                         <td className="p-4 text-slate-600">

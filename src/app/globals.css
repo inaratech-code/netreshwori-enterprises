@@ -103,6 +103,13 @@
   --brand-bg-dark: #e5e5e5;
   background: hsl(var(--background));
 }
+/* Admin: ensure page and section headings are always visible */
+.admin-theme h1,
+.admin-theme h2,
+.admin-theme h3,
+.admin-theme th {
+  color: hsl(var(--foreground));
+}
 
 /* Section gradients – dark charcoal/slate */
 .bg-brand-gradient {

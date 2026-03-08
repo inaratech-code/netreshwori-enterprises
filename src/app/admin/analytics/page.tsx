@@ -56,11 +56,17 @@ export default function AdminAnalyticsPage() {
           hoursMap[`${i}:00`] = 0;
         }
 
+        const dateStr = (e: { date?: unknown }) => (typeof e.date === "string" ? e.date : "");
+        const hourNum = (e: { hour?: unknown }) =>
+          typeof e.hour === "number" && e.hour >= 0 && e.hour < 24 ? e.hour : null;
+
         events.forEach((e) => {
           if (e.type === "page_view") {
             totalV++;
-            if (visitorsMap[e.date] !== undefined) visitorsMap[e.date]++;
-            hoursMap[`${e.hour}:00`]++;
+            const d = dateStr(e);
+            if (d && visitorsMap[d] !== undefined) visitorsMap[d]++;
+            const h = hourNum(e);
+            if (h !== null) hoursMap[`${h}:00`]++;
           } else if (e.type === "product_view") {
             totalPv++;
             if (e.productId) productViews[e.productId] = (productViews[e.productId] || 0) + 1;
@@ -70,9 +76,16 @@ export default function AdminAnalyticsPage() {
         setTotalVisitors(totalV);
         setTotalViews(totalPv);
         setVisitorsByDate(
-          Object.entries(visitorsMap).map(([date, count]) => ({ date: date.slice(5), count }))
+          Object.entries(visitorsMap)
+            .map(([date, count]) => ({ date, count }))
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .map(({ date, count }) => ({ date: date.slice(5), count }))
         );
-        setBusyHours(Object.entries(hoursMap).map(([hour, count]) => ({ hour, count })));
+        setBusyHours(
+          Object.entries(hoursMap)
+            .map(([hour, count]) => ({ hour, count }))
+            .sort((a, b) => parseInt(a.hour, 10) - parseInt(b.hour, 10))
+        );
 
         const top = Object.entries(productViews)
           .sort((a, b) => b[1] - a[1])

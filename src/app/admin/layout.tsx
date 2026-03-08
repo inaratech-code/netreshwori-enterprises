@@ -102,12 +102,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/" className="flex items-center gap-3 min-w-0 group">
               <span className="relative shrink-0 flex items-center justify-center w-14 h-14 rounded-full overflow-hidden bg-white ring-1 ring-border">
                 <Image
-                  src="/logo/admin-logo.png"
+                  src="/logo/LOGO.png"
                   alt="Netreshwori"
                   width={96}
                   height={96}
-                  className="w-11 h-11 object-contain"
-                  onError={(e) => { const t = e.target as HTMLImageElement; if (t) t.src = "/logo/LOGO.png"; }}
+                  className="w-full h-full object-contain"
                 />
               </span>
               <span className="font-semibold text-lg tracking-tight truncate text-foreground group-hover:opacity-90 transition-opacity duration-200">
@@ -152,7 +151,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <button
               type="button"
               onClick={() => signOut()}
-              className="admin-btn flex items-center gap-3 w-full px-4 py-3 rounded-xl font-medium text-destructive hover:bg-destructive/10 transition-colors duration-200 active:scale-[0.98]"
+              className="admin-btn flex items-center gap-3 w-full px-4 py-3 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-colors duration-200 active:scale-[0.98]"
             >
               <LogOut className="w-5 h-5" />
               Logout
@@ -171,17 +170,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Menu className="w-6 h-6" />
           </button>
           <div className="ml-auto flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground hidden sm:block truncate max-w-[180px]">
+            <span className="text-sm font-medium text-muted-foreground hidden sm:block whitespace-nowrap">
               {user.email}
             </span>
             <Link href="/" className="shrink-0 flex items-center h-11 transition-opacity duration-200 hover:opacity-90">
               <Image
-                src="/logo/admin-logo.png"
+                src="/logo/LOGO.png"
                 alt="Netreshwori"
                 width={140}
                 height={44}
                 className="h-11 w-auto object-contain"
-                onError={(e) => { const t = e.target as HTMLImageElement; if (t) t.src = "/logo/LOGO.png"; }}
               />
             </Link>
           </div>
