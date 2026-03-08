@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, Phone, MessageCircle, Star } from "lucide-react";
+import { Menu, X, Phone, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
@@ -107,16 +107,6 @@ export default function Navbar() {
                             <Phone className="w-3 h-3" />
                             <span>Call Us</span>
                         </a>
-                        <Link
-                            href="/#testimonials"
-                            className={cn(
-                                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all hover:scale-105",
-                                "bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
-                            )}
-                        >
-                            <Star className="w-3 h-3" />
-                            <span>Testimonials</span>
-                        </Link>
                         <a
                             href="https://wa.me/9779864320452"
                             target="_blank"
@@ -160,14 +150,6 @@ export default function Navbar() {
                                 </Link>
                             ))}
                             <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
-                                <Link
-                                    href="/#testimonials"
-                                    onClick={() => setIsOpen(false)}
-                                    className="flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-lg font-bold"
-                                >
-                                    <Star className="w-5 h-5" />
-                                    Testimonials
-                                </Link>
                                 <a
                                     href="tel:+9779864320452"
                                     className="flex items-center justify-center gap-2 bg-primary/10 text-primary py-3 rounded-lg font-medium"
