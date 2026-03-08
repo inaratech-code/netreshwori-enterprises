@@ -150,6 +150,7 @@ export default function ProductDetailPage() {
               className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-200"
             >
               {imgSrc && !mainImageFailed ? (
+                // eslint-disable-next-line @next/next/no-img-element -- dynamic product image URL
                 <img
                   src={imgSrc}
                   alt={product.name}
@@ -175,6 +176,7 @@ export default function ProductDetailPage() {
                         : "border-transparent opacity-70 hover:opacity-100 hover:scale-105"
                     }`}
                   >
+                    {/* eslint-disable-next-line @next/next/no-img-element -- dynamic product gallery URL */}
                     <img
                       src={img}
                       alt=""

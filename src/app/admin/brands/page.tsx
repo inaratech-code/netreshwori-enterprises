@@ -225,6 +225,7 @@ export default function AdminBrandsPage() {
                   key={partner.name}
                   className="flex items-center gap-3 rounded-lg border p-3 bg-muted/30"
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element -- partner logo from public/partners */}
                   <img
                     src={partner.logo}
                     alt={partner.name}

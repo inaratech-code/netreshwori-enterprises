@@ -23,6 +23,7 @@ function FormImageThumb({ url, onRemove }: { url: string; onRemove: () => void }
   return (
     <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 group bg-slate-100">
       {src && !failed ? (
+        // eslint-disable-next-line @next/next/no-img-element -- admin form thumbnail, dynamic URL
         <img
           src={src}
           alt=""
@@ -70,6 +71,7 @@ function ProductRowThumbnail({ src }: { src: string | undefined }) {
     );
   }
   return (
+    // eslint-disable-next-line @next/next/no-img-element -- table thumbnail, dynamic URL
     <img
       src={resolved}
       alt=""

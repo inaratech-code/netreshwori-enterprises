@@ -74,6 +74,7 @@ function ProductCardInner({ product, priority = false, queryParams }: ProductCar
         className="block relative aspect-square overflow-hidden bg-muted"
       >
         {showImg ? (
+          // eslint-disable-next-line @next/next/no-img-element -- product image, dynamic URL
           <img
             src={imgSrc}
             alt={product.name}

@@ -167,6 +167,22 @@
 .admin-theme .shadow-primary\/20 {
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
 }
+/* Exception: logout button stays red (high specificity to override theme) */
+.admin-theme button.admin-logout-btn {
+  color: #dc2626 !important;
+}
+.admin-theme button.admin-logout-btn svg {
+  color: #dc2626 !important;
+  stroke: #dc2626 !important;
+}
+.admin-theme button.admin-logout-btn:hover {
+  color: #b91c1c !important;
+  background-color: #fef2f2 !important;
+}
+.admin-theme button.admin-logout-btn:hover svg {
+  color: #b91c1c !important;
+  stroke: #b91c1c !important;
+}
 
 /* Section gradients – dark charcoal/slate */
 .bg-brand-gradient {

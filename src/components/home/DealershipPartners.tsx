@@ -19,6 +19,7 @@ function PartnerLogo({ partner }: { partner: { name: string; logo: string; url?:
                 {failed ? (
                     <span className="text-2xl font-bold text-slate-400">{initial}</span>
                 ) : (
+                    // eslint-disable-next-line @next/next/no-img-element -- partner logo from public/partners
                     <img
                         src={partner.logo}
                         alt={partner.name}
