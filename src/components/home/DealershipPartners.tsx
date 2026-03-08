@@ -15,7 +15,7 @@ function PartnerLogo({ partner }: { partner: { name: string; logo: string; url?:
             rel={partner.url && partner.url !== "#" ? "noreferrer" : undefined}
             className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 hover:border-primary/20 transition-all shrink-0 w-[160px] md:w-[180px]"
         >
-            <div className="relative w-24 h-16 md:w-28 md:h-20 grayscale hover:grayscale-0 opacity-80 hover:opacity-100 transition-all flex items-center justify-center bg-slate-100 rounded-lg">
+            <div className="relative w-24 h-16 md:w-28 md:h-20 opacity-95 hover:opacity-100 transition-opacity flex items-center justify-center bg-slate-100 rounded-lg [filter:none]" style={{ filter: 'none' }}>
                 {failed ? (
                     <span className="text-2xl font-bold text-slate-400">{initial}</span>
                 ) : (
@@ -23,6 +23,7 @@ function PartnerLogo({ partner }: { partner: { name: string; logo: string; url?:
                         src={partner.logo}
                         alt={partner.name}
                         className="w-full h-full object-contain"
+                        style={{ filter: 'none' }}
                         onError={() => setFailed(true)}
                     />
                 )}
