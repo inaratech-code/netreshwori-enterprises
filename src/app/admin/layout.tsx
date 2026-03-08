@@ -67,7 +67,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background transition-colors duration-300">
+      <div className="admin-theme min-h-screen flex items-center justify-center bg-background transition-colors duration-300">
         <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin transition-opacity duration-300" />
       </div>
     );
@@ -76,7 +76,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!user) return null;
 
   return (
-    <div className="h-screen max-h-screen bg-muted/30 flex overflow-hidden">
+    <div className="admin-theme h-screen max-h-screen bg-background flex overflow-hidden">
       <AnimatePresence>
         {sidebarOpen && (
           <motion.div

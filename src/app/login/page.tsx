@@ -31,15 +31,15 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-            <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
+        <div className="admin-theme min-h-screen flex items-center justify-center bg-background p-4">
+            <div className="max-w-md w-full bg-card p-8 rounded-3xl shadow-xl border border-border">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Admin Login</h1>
                     <p className="text-slate-500 mt-2">Sign in to access the Netreshwori dashboard.</p>
                 </div>
 
                 {error && (
-                    <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl flex items-start gap-3 text-sm">
+                    <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-xl flex items-start gap-3 text-sm">
                         <AlertCircle className="w-5 h-5 shrink-0" />
                         <span>{error}</span>
                     </div>

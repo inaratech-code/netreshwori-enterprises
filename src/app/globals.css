@@ -62,6 +62,33 @@
   }
 }
 
+/* Admin panel: black & white theme only */
+.admin-theme {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 0% 40%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 0 0% 9%;
+  --brand-bg: #ffffff;
+  --brand-bg-light: #f5f5f5;
+  --brand-bg-dark: #e5e5e5;
+  background: hsl(var(--background));
+}
+
 /* Section gradients – dark charcoal/slate */
 .bg-brand-gradient {
   background: linear-gradient(180deg, var(--brand-bg-light) 0%, var(--brand-bg) 50%, var(--brand-bg-dark) 100%);
