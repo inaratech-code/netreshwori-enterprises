@@ -8,6 +8,7 @@ import ProductCard from "@/components/product/ProductCard";
 import ProductCardSkeleton from "@/components/product/ProductCardSkeleton";
 import { getProductsPaginated, getCategories, getBrands } from "@/lib/admin/firestore";
 import type { Product, Category, Brand } from "@/lib/admin/types";
+import { SIZE_FILTER_OPTIONS, FINISH_FILTER_OPTIONS } from "@/data/filterOptions";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -116,22 +117,25 @@ function ProductsContent() {
     return () => io.disconnect();
   }, [hasMore, loadingMore, loading, loadMore]);
 
-  const uniqueSizes = useMemo(() => {
-    const set = new Set<string>();
+  // Predefined options from catalog; merge in any sizes/finishes from current products not in the list
+  const sizeFilterOptions = useMemo(() => {
+    const fromProducts = new Set<string>();
     products.forEach((p) => {
       const s = (p.size ?? "").trim();
-      if (s) set.add(s);
+      if (s) fromProducts.add(s);
     });
-    return Array.from(set).sort();
+    const combined = new Set([...SIZE_FILTER_OPTIONS, ...fromProducts]);
+    return Array.from(combined).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
   }, [products]);
 
-  const uniqueFinishes = useMemo(() => {
-    const set = new Set<string>();
+  const finishFilterOptions = useMemo(() => {
+    const fromProducts = new Set<string>();
     products.forEach((p) => {
       const f = (p.finish ?? "").trim();
-      if (f) set.add(f);
+      if (f) fromProducts.add(f);
     });
-    return Array.from(set).sort();
+    const combined = new Set([...FINISH_FILTER_OPTIONS, ...fromProducts]);
+    return Array.from(combined).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
   }, [products]);
 
   // Brand filter options: all brands sorted by name (brand name falls under the brand filter)
@@ -245,19 +249,15 @@ function ProductsContent() {
                   <select
                     value={selectedSize ?? ""}
                     onChange={(e) => setSelectedSize(e.target.value || null)}
-                    className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer disabled:opacity-60"
-                    disabled={uniqueSizes.length === 0 && !loading}
+                    className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
                   >
                     <option value="">All</option>
-                    {uniqueSizes.map((s) => (
+                    {sizeFilterOptions.map((s) => (
                       <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
                 </div>
-                {uniqueSizes.length === 0 && !loading && (
-                  <p className="text-sm text-muted-foreground mt-2 px-1">No sizes in current results</p>
-                )}
               </div>
               <div>
                 <h3 className="font-semibold text-foreground mb-4">Finish</h3>
@@ -265,19 +265,15 @@ function ProductsContent() {
                   <select
                     value={selectedFinish ?? ""}
                     onChange={(e) => setSelectedFinish(e.target.value || null)}
-                    className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer disabled:opacity-60"
-                    disabled={uniqueFinishes.length === 0 && !loading}
+                    className="w-full appearance-none bg-muted border border-border rounded-xl pl-4 pr-10 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all cursor-pointer"
                   >
                     <option value="">All</option>
-                    {uniqueFinishes.map((f) => (
+                    {finishFilterOptions.map((f) => (
                       <option key={f} value={f}>{f}</option>
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" aria-hidden />
                 </div>
-                {uniqueFinishes.length === 0 && !loading && (
-                  <p className="text-sm text-muted-foreground mt-2 px-1">No finishes in current results</p>
-                )}
               </div>
             </div>
           </aside>
