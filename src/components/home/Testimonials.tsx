@@ -132,7 +132,7 @@ export default function Testimonials() {
                             </div>
                         ) : null}
                         <Link
-                            href="/contact"
+                            href="/testimonial"
                             className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-full font-semibold transition-all hover:shadow-lg"
                         >
                             <MessageCircle className="w-5 h-5" />

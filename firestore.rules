@@ -40,10 +40,18 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Testimonials can be read publicly; admin manages approval, etc.
+    // Testimonials: public can create (pending approval); public read; admin update/delete.
     match /testimonials/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly(["name", "message", "rating", "approved", "createdAt"])
+        && request.resource.data.name is string
+        && request.resource.data.message is string
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.approved == false
+        && (request.resource.data.createdAt == request.time || request.resource.data.createdAt == null);
+      allow update, delete: if isAdmin();
     }
 
     // Inquiries: public can create, admins can manage.
