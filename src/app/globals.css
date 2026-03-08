@@ -129,6 +129,15 @@
   background: hsl(var(--muted-foreground) / 0.5);
 }
 
+/* Hide scrollbar but keep scroll behavior (e.g. Dealership Partners) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Shimmer for skeleton loaders */
 @keyframes shimmer {
   0% { background-position: -200% 0; }

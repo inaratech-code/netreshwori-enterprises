@@ -69,11 +69,11 @@ export default function DealershipPartners() {
             </div>
             <div
                 ref={scrollRef}
-                className="relative overflow-x-auto overflow-y-hidden py-4 scroll-smooth"
+                className="relative overflow-x-auto overflow-y-hidden py-4 scroll-smooth scrollbar-hide"
                 style={{ scrollbarGutter: "stable" }}
             >
                 <motion.div
-                    className="flex shrink-0 gap-12 md:gap-16 items-center w-max min-w-full"
+                    className="flex shrink-0 gap-12 md:gap-16 items-center w-max"
                     animate={{ x: [0, "-50%"] }}
                     transition={{
                         x: {
