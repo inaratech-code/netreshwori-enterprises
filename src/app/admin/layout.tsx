@@ -21,7 +21,6 @@ import {
   Building2,
 } from "lucide-react";
 import { AdminCacheProvider } from "./AdminCacheContext";
-import { ThemeToggle } from "@/components/admin/ThemeToggle";
 import { cn } from "@/lib/utils";
 
 const ADMIN_LINKS = [
@@ -171,7 +170,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Menu className="w-6 h-6" />
           </button>
           <div className="ml-auto flex items-center gap-2">
-            <ThemeToggle />
             <span className="text-sm font-medium text-muted-foreground hidden sm:block truncate max-w-[180px]">
               {user.email}
             </span>
