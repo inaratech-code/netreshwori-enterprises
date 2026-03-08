@@ -3,8 +3,20 @@
 import { useState, memo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Star } from "lucide-react";
+import { Star, MessageCircle } from "lucide-react";
 import { cn, resolveProductImageSrc } from "@/lib/utils";
+
+const WHATSAPP_NUMBER = "9779864320452";
+
+function buildWhatsAppMessage(name: string, brand: string | undefined, code: string): string {
+  const lines = [
+    "Hi, I'm interested in this product:",
+    `Name: ${name}`,
+    brand ? `Brand: ${brand}` : null,
+    code ? `Code: ${code}` : null,
+  ].filter(Boolean);
+  return lines.join("\n");
+}
 
 function getFirstImageValue(images: string[] | string | undefined): string {
   if (!images) return "";
@@ -18,6 +30,7 @@ function getFirstImageValue(images: string[] | string | undefined): string {
 export interface ProductCardProduct {
   id: string;
   name: string;
+  productCode?: string;
   brand?: string;
   brandId?: string;
   category?: string;
@@ -32,13 +45,19 @@ export interface ProductCardProduct {
 interface ProductCardProps {
   product: ProductCardProduct;
   priority?: boolean;
+  /** When set (e.g. from listing filters), product detail page will show more products matching these. */
+  queryParams?: { category?: string; brand?: string };
 }
 
-function ProductCardInner({ product, priority = false }: ProductCardProps) {
+function ProductCardInner({ product, priority = false, queryParams }: ProductCardProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const rawImg = getFirstImageValue(product.images);
   const imgSrc = resolveProductImageSrc(rawImg);
   const showImg = imgSrc && !imgFailed;
+  const search = new URLSearchParams();
+  if (queryParams?.category) search.set("category", queryParams.category);
+  if (queryParams?.brand) search.set("brand", queryParams.brand);
+  const productHref = `/products/${product.id}${search.toString() ? `?${search.toString()}` : ""}`;
 
   return (
     <motion.div
@@ -51,7 +70,7 @@ function ProductCardInner({ product, priority = false }: ProductCardProps) {
       )}
     >
       <Link
-        href={`/products/${product.id}`}
+        href={productHref}
         className="block relative aspect-square overflow-hidden bg-muted"
       >
         {showImg ? (
@@ -89,7 +108,7 @@ function ProductCardInner({ product, priority = false }: ProductCardProps) {
 
       <div className="p-6 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-2 gap-2">
-          <Link href={`/products/${product.id}`}>
+          <Link href={productHref}>
             <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1">
               {product.name}
             </h3>
@@ -102,16 +121,24 @@ function ProductCardInner({ product, priority = false }: ProductCardProps) {
           )}
         </div>
 
-        {(product.brand || product.category) && (
-          <p className="text-muted-foreground text-sm mb-4 line-clamp-1">
-            {[product.brand, product.category].filter(Boolean).join(" · ")}
-          </p>
-        )}
+        <div className="text-muted-foreground text-sm space-y-1 mb-4">
+          {product.brand && <p className="line-clamp-1"><span className="font-medium text-foreground/80">Brand:</span> {product.brand}</p>}
+          {(product.productCode ?? "").trim() && <p className="line-clamp-1"><span className="font-medium text-foreground/80">Code:</span> {product.productCode}</p>}
+        </div>
 
-        <div className="mt-auto pt-4 border-t border-border">
+        <div className="mt-auto pt-4 border-t border-border flex flex-col sm:flex-row gap-3">
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildWhatsAppMessage(product.name, product.brand, product.productCode ?? ""))}`}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors"
+          >
+            <MessageCircle className="w-4 h-4 shrink-0" />
+            WhatsApp
+          </a>
           <Link
-            href={`/products/${product.id}`}
-            className="text-primary text-sm font-bold hover:underline underline-offset-4 transition-colors"
+            href={productHref}
+            className="inline-flex items-center justify-center text-primary text-sm font-bold hover:underline underline-offset-4 transition-colors py-2.5"
           >
             View Details →
           </Link>

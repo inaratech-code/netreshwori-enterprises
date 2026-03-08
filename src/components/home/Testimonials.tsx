@@ -88,7 +88,8 @@ export default function Testimonials() {
                                         {Array.from({ length: 5 }).map((_, i) => (
                                             <Star
                                                 key={i}
-                                                className={`w-6 h-6 ${i < display[current].rating ? "fill-primary text-primary" : "text-slate-300"}`}
+                                                className={`w-6 h-6 ${i < display[current].rating ? "fill-amber-400 text-amber-400 stroke-amber-500" : "fill-slate-200 text-slate-300 stroke-slate-300"}`}
+                                                strokeWidth={1.5}
                                             />
                                         ))}
                                     </div>

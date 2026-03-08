@@ -1,17 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { ChevronRight, Share2, Heart, MessageCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { getProduct, getCategories, getBrands, getSimilarProducts } from "@/lib/admin/firestore";
+import { getProduct, getCategories, getBrands, getSimilarProducts, getProductsPaginated } from "@/lib/admin/firestore";
 import type { Product, Category, Brand } from "@/lib/admin/types";
 import { resolveProductImageSrc } from "@/lib/utils";
 import ProductCard from "@/components/product/ProductCard";
 
+const MORE_PRODUCTS_LIMIT = 8;
+
 export default function ProductDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = typeof params?.id === "string" ? params.id : null;
   const [product, setProduct] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -20,7 +23,8 @@ export default function ProductDetailPage() {
   const [notFound, setNotFound] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [mainImageFailed, setMainImageFailed] = useState(false);
-  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
+  const [moreProducts, setMoreProducts] = useState<Product[]>([]);
+  const [moreProductsLoading, setMoreProductsLoading] = useState(false);
 
   useEffect(() => {
     setMainImageFailed(false);
@@ -54,12 +58,44 @@ export default function ProductDetailPage() {
     };
   }, [id]);
 
+  // More products: match user's filter (URL params) or current product's category/brand; fallback to any products
   useEffect(() => {
-    if (!product?.categoryId || !product?.id) return;
-    getSimilarProducts(product.id, product.categoryId, { brandId: product.brandId ?? undefined, limit: 8 })
-      .then(setSimilarProducts)
-      .catch(() => setSimilarProducts([]));
-  }, [product?.id, product?.categoryId, product?.brandId]);
+    if (!product?.id) {
+      setMoreProducts([]);
+      return;
+    }
+    setMoreProductsLoading(true);
+    const categoryIdFromUrl = searchParams.get("category") ?? undefined;
+    const brandIdFromUrl = searchParams.get("brand") ?? undefined;
+    const categoryId = (categoryIdFromUrl || product.categoryId) ?? undefined;
+    const brandId = (brandIdFromUrl || product.brandId) ?? undefined;
+
+    if (categoryId) {
+      getSimilarProducts(product.id, categoryId, { brandId, limit: MORE_PRODUCTS_LIMIT })
+        .then((list) => {
+          if (list.length > 0) {
+            setMoreProducts(list);
+            setMoreProductsLoading(false);
+            return;
+          }
+          return getProductsPaginated(MORE_PRODUCTS_LIMIT + 4, null, {})
+            .then((res) => res.products.filter((p) => p.id !== product.id).slice(0, MORE_PRODUCTS_LIMIT));
+        })
+        .then((fallback) => {
+          if (Array.isArray(fallback)) {
+            setMoreProducts(fallback);
+          }
+        })
+        .catch(() => setMoreProducts([]))
+        .finally(() => setMoreProductsLoading(false));
+    } else {
+      getProductsPaginated(MORE_PRODUCTS_LIMIT + 4, null, {})
+        .then((res) => res.products.filter((p) => p.id !== product.id).slice(0, MORE_PRODUCTS_LIMIT))
+        .then(setMoreProducts)
+        .catch(() => setMoreProducts([]))
+        .finally(() => setMoreProductsLoading(false));
+    }
+  }, [product?.id, product?.categoryId, product?.brandId, searchParams]);
 
   const categoryName = product ? categories.find((c) => c.id === product.categoryId)?.name ?? "" : "";
   const brandName = product?.brandId ? brands.find((b) => b.id === product.brandId)?.name ?? "" : "";
@@ -237,11 +273,19 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {similarProducts.length > 0 && (
-          <section className="border-t border-slate-200 pt-16">
-            <h2 className="text-2xl font-bold text-white mb-8">Similar products</h2>
+        <section className="border-t border-slate-200 pt-16">
+          <h2 className="text-2xl font-bold text-white mb-2">More products</h2>
+          <p className="text-slate-400 text-sm mb-8">
+            Matches your filter or same category and brand as this product.
+          </p>
+          {moreProductsLoading ? (
+            <div className="flex items-center gap-2 text-slate-400 py-8">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span>Loading more products...</span>
+            </div>
+          ) : moreProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {similarProducts.map((p) => {
+              {moreProducts.map((p) => {
                 const images = Array.isArray(p.images) ? p.images : (p as { image?: string }).image ? [(p as { image?: string }).image!] : [];
                 return (
                   <ProductCard
@@ -249,6 +293,7 @@ export default function ProductDetailPage() {
                     product={{
                       id: p.id,
                       name: p.name ?? "",
+                      productCode: p.productCode ?? "",
                       brand: p.brandId ? brands.find((b) => b.id === p.brandId)?.name : undefined,
                       brandId: p.brandId,
                       category: p.categoryId ? categories.find((c) => c.id === p.categoryId)?.name : undefined,
@@ -261,8 +306,10 @@ export default function ProductDetailPage() {
                 );
               })}
             </div>
-          </section>
-        )}
+          ) : (
+            <p className="text-slate-400 text-sm py-8">No other products to show right now.</p>
+          )}
+        </section>
       </div>
     </div>
   );

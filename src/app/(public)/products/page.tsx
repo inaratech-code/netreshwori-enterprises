@@ -165,6 +165,7 @@ function ProductsContent() {
       return {
         id: p.id,
         name: p.name,
+        productCode: p.productCode ?? "",
         brand: brandName,
         brandId: p.brandId,
         category: categoryName,
@@ -181,9 +182,10 @@ function ProductsContent() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4 tracking-tight">Our Collection</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">
+          <p className="text-lg text-muted-foreground max-w-2xl mb-2">
             Browse our catalog of premium tiles. Use filters to find what you need.
           </p>
+          <p className="text-sm text-muted-foreground/90 italic">Subject to Availability.</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -292,6 +294,10 @@ function ProductsContent() {
                       key={product.id}
                       product={product}
                       priority={i < 6}
+                      queryParams={{
+                        category: selectedCategoryId ?? undefined,
+                        brand: selectedBrandId ?? undefined,
+                      }}
                     />
                   ))}
                 </>
