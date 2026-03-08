@@ -100,10 +100,7 @@ const ProductTableRow = React.memo(function ProductTableRow({
 }: ProductRowProps) {
   return (
     <tr className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors duration-200 group">
-      <td className="p-4 pl-6 w-20">
-        <ProductRowThumbnail src={p.images?.[0]} />
-      </td>
-      <td className="p-4 w-28">
+      <td className="p-4 pl-6 w-28">
         <span className="font-mono text-sm text-slate-600">{p.productCode || "—"}</span>
       </td>
       <td className="p-4">
@@ -115,6 +112,11 @@ const ProductTableRow = React.memo(function ProductTableRow({
         </span>
       </td>
       <td className="p-4 text-sm text-slate-600">{getBrandName(p.brandId ?? "")}</td>
+      <td className="p-4 text-sm text-slate-600">{p.size || "—"}</td>
+      <td className="p-4 text-sm text-slate-600">{p.finish || "—"}</td>
+      <td className="p-4 w-20">
+        <ProductRowThumbnail src={p.images?.[0]} />
+      </td>
       <td className="p-4">
         <button
           type="button"
@@ -895,11 +897,13 @@ export default function AdminProductsPage() {
                     <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                             <tr className="bg-slate-50 border-b border-slate-200 text-sm font-semibold text-slate-600">
-                                <th className="p-4 pl-6 w-20">Image</th>
-                                <th className="p-4 w-28">Code</th>
-                                <th className="p-4">Name</th>
-                                <th className="p-4">Category</th>
-                                <th className="p-4">Brand</th>
+                                <th className="p-4 pl-6 w-28">product code</th>
+                                <th className="p-4">name</th>
+                                <th className="p-4">category</th>
+                                <th className="p-4">brand</th>
+                                <th className="p-4">size</th>
+                                <th className="p-4">finish</th>
+                                <th className="p-4 w-20">image</th>
                                 <th className="p-4">Visible</th>
                                 <th className="p-4 pr-6 text-right">Actions</th>
                             </tr>
@@ -908,18 +912,20 @@ export default function AdminProductsPage() {
                             {productsLoading && products.length === 0 ? (
                                 Array.from({ length: 10 }).map((_, i) => (
                                     <tr key={i} className="border-b border-border">
-                                        <td className="p-4 pl-6"><Skeleton className="w-12 h-12 rounded-xl" /></td>
-                                        <td className="p-4"><Skeleton className="h-4 w-20" /></td>
+                                        <td className="p-4 pl-6"><Skeleton className="h-4 w-20" /></td>
                                         <td className="p-4"><Skeleton className="h-4 w-40" /></td>
                                         <td className="p-4"><Skeleton className="h-4 w-24" /></td>
                                         <td className="p-4"><Skeleton className="h-4 w-20" /></td>
+                                        <td className="p-4"><Skeleton className="h-4 w-16" /></td>
+                                        <td className="p-4"><Skeleton className="h-4 w-16" /></td>
+                                        <td className="p-4"><Skeleton className="w-12 h-12 rounded-xl" /></td>
                                         <td className="p-4"><Skeleton className="h-8 w-14 rounded-full" /></td>
                                         <td className="p-4 pr-6"><Skeleton className="h-8 w-16 ml-auto" /></td>
                                     </tr>
                                 ))
                             ) : filteredProducts.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="p-12 text-center text-muted-foreground font-medium">
+                                    <td colSpan={9} className="p-12 text-center text-muted-foreground font-medium">
                                         No products found.
                                     </td>
                                 </tr>
