@@ -79,24 +79,24 @@ export default function ContactPage() {
                                     key={card.title}
                                     className="flex gap-4 p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:border-primary/30 hover:shadow-md transition-all"
                                 >
-                                    <div className={`${card.iconClass} w-12 h-12 rounded-xl shrink-0 flex items-center justify-center`}>
+                                    <div className={`w-12 h-12 rounded-xl shrink-0 flex items-center justify-center ${card.title === "WhatsApp" ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-800"}`}>
                                         <Icon className="w-6 h-6" strokeWidth={1.75} />
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <h3 className="font-semibold text-slate-900 mb-0.5">{card.title}</h3>
                                         {card.subtitle && (
-                                            <p className="text-slate-500 text-sm mb-2">{card.subtitle}</p>
+                                            <p className="text-slate-600 text-sm mb-2">{card.subtitle}</p>
                                         )}
                                         {"items" in card && card.items ? (
                                             <div className="space-y-2">
                                                 {card.items.map((item) => (
                                                     <div key={item.label} className="flex flex-wrap items-center gap-2">
-                                                        <span className="text-slate-700 text-sm">{item.label}</span>
+                                                        <span className="text-slate-800 text-sm font-medium">{item.label}</span>
                                                         <a
                                                             href={item.href}
                                                             target="_blank"
                                                             rel="noreferrer"
-                                                            className="text-primary font-medium text-sm hover:underline"
+                                                            className="text-slate-900 font-medium text-sm hover:text-slate-700 hover:underline"
                                                         >
                                                             Directions →
                                                         </a>
@@ -109,7 +109,7 @@ export default function ContactPage() {
                                                     href={card.link.href}
                                                     target={card.link.external ? "_blank" : undefined}
                                                     rel={card.link.external ? "noreferrer" : undefined}
-                                                    className="text-primary font-medium text-sm hover:underline break-all"
+                                                    className="text-slate-900 font-medium text-sm hover:text-slate-700 hover:underline break-all"
                                                 >
                                                     {card.link.text}
                                                 </a>
@@ -203,7 +203,7 @@ export default function ContactPage() {
                                 </div>
                                 <button
                                     type="submit"
-                                    className="mt-2 w-full py-3.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center justify-center gap-2"
+                                    className="mt-2 w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-lg transition-all flex items-center justify-center gap-2"
                                 >
                                     <Send className="w-5 h-5" aria-hidden />
                                     Send message
@@ -221,10 +221,10 @@ export default function ContactPage() {
                             Tap a red pin for details, or open in Google Maps for directions.
                         </p>
                         <div className="flex gap-4 text-sm">
-                            <a href={HEAD_OFFICE_MAPS} target="_blank" rel="noreferrer" className="text-primary font-medium hover:underline">
+                            <a href={HEAD_OFFICE_MAPS} target="_blank" rel="noreferrer" className="text-slate-900 font-medium hover:underline">
                                 Head office →
                             </a>
-                            <a href={BRANCH_OFFICE_MAPS} target="_blank" rel="noreferrer" className="text-primary font-medium hover:underline">
+                            <a href={BRANCH_OFFICE_MAPS} target="_blank" rel="noreferrer" className="text-slate-900 font-medium hover:underline">
                                 Branch office →
                             </a>
                         </div>
