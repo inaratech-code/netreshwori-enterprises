@@ -75,15 +75,16 @@ export default function Testimonials() {
                                 <span>Loading testimonials...</span>
                             </div>
                         ) : count > 0 ? (
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={current}
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
-                                    transition={{ duration: 0.5 }}
-                                    className="text-center z-10 w-full"
-                                >
+                            <div className="relative overflow-hidden w-full min-h-[280px]">
+                                <AnimatePresence initial={false} mode="wait">
+                                    <motion.div
+                                        key={current}
+                                        initial={{ x: "100%", opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        exit={{ x: "-100%", opacity: 0 }}
+                                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                                        className="text-center z-10 w-full absolute inset-0 flex flex-col items-center justify-center px-4"
+                                    >
                                     <div className="flex justify-center gap-1 mb-6">
                                         {Array.from({ length: 5 }).map((_, i) => (
                                             <Star
@@ -107,7 +108,8 @@ export default function Testimonials() {
                                         <p className="text-slate-500">{display[current].role}</p>
                                     </div>
                                 </motion.div>
-                            </AnimatePresence>
+                                </AnimatePresence>
+                            </div>
                         ) : (
                             <p className="text-slate-500 text-center">No testimonials yet. Share your experience!</p>
                         )}
