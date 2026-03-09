@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageTransition from "@/components/layout/PageTransition";
+import FloatingWhatsApp from "@/components/layout/FloatingWhatsApp";
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
     return (
@@ -11,6 +12,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                 <PageTransition>{children}</PageTransition>
             </main>
             <Footer />
+            <FloatingWhatsApp />
         </div>
     );
 }
