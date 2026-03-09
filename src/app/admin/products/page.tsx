@@ -205,6 +205,7 @@ export default function AdminProductsPage() {
     const [tablePage, setTablePage] = useState(1);
     const TABLE_PAGE_SIZE = 20;
     const INITIAL_PRODUCTS_LIMIT = 50;
+    const hasImageUploadStorage = typeof process !== "undefined" && !!process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim();
     const debouncedSearch = useDebounce(search, 300);
     const [lastProductDoc, setLastProductDoc] = useState<DocumentSnapshot | null>(null);
     const [hasMoreProducts, setHasMoreProducts] = useState(true);
@@ -1106,16 +1107,22 @@ export default function AdminProductsPage() {
 
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">Images</label>
-                                <p className="text-xs text-slate-500 mb-2">Paste an image URL below and click <strong>Add URL</strong>, then <strong>Save Product</strong>. (Upload requires Firebase Storage.) Some URLs show &quot;Preview unavailable&quot; here but still work on the product page.</p>
+                                <p className="text-xs text-slate-500 mb-2">
+                                    {hasImageUploadStorage
+                                        ? "Paste an image URL below and click Add URL, or use Upload. Then Save Product. Some URLs show \"Preview unavailable\" here but still work on the product page."
+                                        : "Add images by pasting image URLs below and click Add URL, then Save Product. Some URLs show \"Preview unavailable\" here but still work on the product page."}
+                                </p>
                                 <div className="flex flex-wrap gap-4">
                                     {form.images?.map((img, idx) => (
                                         <FormImageThumb key={idx} url={img} onRemove={() => removeImage(idx)} />
                                     ))}
-                                    <label className="w-24 h-24 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
-                                        {uploading ? <Loader2 className="w-6 h-6 animate-spin text-primary" /> : <ImagePlus className="w-6 h-6 mb-1 text-slate-400" />}
-                                        <span className="text-xs font-semibold">Upload</span>
-                                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleFileUpload} disabled={uploading} />
-                                    </label>
+                                    {hasImageUploadStorage && (
+                                        <label className="w-24 h-24 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-500 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
+                                            {uploading ? <Loader2 className="w-6 h-6 animate-spin text-primary" /> : <ImagePlus className="w-6 h-6 mb-1 text-slate-400" />}
+                                            <span className="text-xs font-semibold">Upload</span>
+                                            <input type="file" multiple accept="image/*" className="hidden" onChange={handleFileUpload} disabled={uploading} />
+                                        </label>
+                                    )}
                                 </div>
                                 <div className="mt-3 flex flex-wrap items-center gap-2">
                                     <input
@@ -1226,7 +1233,7 @@ export default function AdminProductsPage() {
                         </div>
                         <div className="p-6 overflow-y-auto flex-1 space-y-4">
                             <p className="text-sm text-slate-600">
-                                Upload a <strong>CSV</strong> or <strong>JSON</strong> file, or use a <strong>Google Sheet</strong>. Each product needs <strong>name</strong> and <strong>category</strong>. Optional: <strong>productCode</strong>, <strong>brand</strong>, <strong>size</strong>, <strong>finish</strong>, <strong>image</strong> (full URL or Google Drive link). You can also attach image files below (assigned in order) if you use Firebase Storage.
+                                Upload a <strong>CSV</strong> or <strong>JSON</strong> file, or use a <strong>Google Sheet</strong>. Each product needs <strong>name</strong> and <strong>category</strong>. Optional: <strong>productCode</strong>, <strong>brand</strong>, <strong>size</strong>, <strong>finish</strong>, <strong>image</strong> (full URL or Google Drive link).{hasImageUploadStorage ? " You can also attach image files below (assigned in order)." : ""}
                             </p>
                             <div className="space-y-2">
                                 <label className="block text-sm font-semibold text-slate-700">Import from Google Sheet</label>
@@ -1296,8 +1303,9 @@ export default function AdminProductsPage() {
                                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-900 resize-y"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Bulk image upload (optional)</label>
+                            {hasImageUploadStorage && (
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">Bulk image upload (optional)</label>
                                 <p className="text-xs text-slate-500 mb-2">Select image files in the same order as your products. 1st file → 1st product, 2nd file → 2nd product. Only used for rows that have no image/URL in the file.</p>
                                 <input
                                     type="file"
@@ -1308,8 +1316,9 @@ export default function AdminProductsPage() {
                                 />
                                 {bulkImageFiles.length > 0 && (
                                     <p className="mt-2 text-sm text-slate-500">{bulkImageFiles.length} image(s) selected. Will assign in order to products that don’t have an image in the CSV/JSON.</p>
-                                )}
-                            </div>
+                                    )}
+                                </div>
+                            )}
                             {bulkError && <p className="text-sm text-red-600 bg-red-50 px-4 py-2 rounded-xl">{bulkError}</p>}
                         </div>
                         <div className="p-4 border-t border-slate-100 flex justify-end gap-3 bg-white">
