@@ -263,19 +263,19 @@ export default function ProductDetailPage() {
             </h1>
             <div className="flex items-center gap-4 text-sm font-medium flex-wrap mb-6">
               {brandName && (
-                <span className="text-slate-500 border-r border-slate-200 pr-4">
+                <span className="text-slate-300 border-r border-slate-400 pr-4">
                   Brand: <span className="text-white uppercase tracking-wide">{brandName}</span>
                 </span>
               )}
               {(product.size || product.finish) && (
-                <span className="text-slate-500">
+                <span className="text-slate-200">
                   {[product.size, product.finish].filter(Boolean).join(" · ")}
                 </span>
               )}
             </div>
 
             {product.description && (
-              <p className="text-slate-600 text-lg leading-relaxed mb-8">{product.description}</p>
+              <p className="text-slate-200 text-lg leading-relaxed mb-8">{product.description}</p>
             )}
 
             <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-8 max-w-md">
