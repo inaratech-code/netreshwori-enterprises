@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { ChevronRight, Share2, Heart, MessageCircle, Loader2 } from "lucide-react";
+import { ChevronRight, Share2, Heart, MessageCircle, Loader2, Search } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { getProduct, getCategories, getBrands, getSimilarProducts, getProductsPaginated } from "@/lib/admin/firestore";
@@ -221,7 +221,8 @@ export default function ProductDetailPage() {
                 </div>
               )}
               {imgSrc && !mainImageFailed && (
-                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 text-white text-xs font-medium pointer-events-none hidden sm:block">
+                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 text-white text-xs font-medium pointer-events-none hidden sm:flex">
+                  <Search className="w-3.5 h-3.5 shrink-0" aria-hidden />
                   Hover to zoom
                 </span>
               )}
