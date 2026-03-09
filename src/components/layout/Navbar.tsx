@@ -67,7 +67,7 @@ export default function Navbar() {
                             alt="Netreshwori Enterprises"
                             width={440}
                             height={110}
-                            className="h-20 w-auto sm:h-24 md:h-28 lg:h-32 object-contain drop-shadow-sm"
+                            className="h-28 w-auto sm:h-32 md:h-36 lg:h-40 object-contain drop-shadow-sm"
                             priority
                         />
                     </Link>
