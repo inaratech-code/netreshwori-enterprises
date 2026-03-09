@@ -712,9 +712,13 @@ export default function AdminProductsPage() {
                         : (p.category?.trim() ? categoryByNameMutable.get(p.category.trim().toLowerCase()) : undefined)!;
                     const brandId = p.brandId ?? (p.brand ? brandByNameMutable.get(p.brand.trim().toLowerCase()) : undefined) ?? undefined;
                     let productImages: string[] = [];
-                    const singleImage = (p as { image?: string; imageUrl?: string; image_url?: string }).image?.trim()
+                    const singleImage = (p as { image?: string }).image?.trim()
                         || (p as { imageUrl?: string }).imageUrl?.trim()
-                        || (p as { image_url?: string }).image_url?.trim();
+                        || (p as { image_url?: string }).image_url?.trim()
+                        || (p as { imageLink?: string }).imageLink?.trim()
+                        || (p as { image_link?: string }).image_link?.trim()
+                        || (p as { photo?: string }).photo?.trim()
+                        || (p as { picture?: string }).picture?.trim();
                     if (singleImage) {
                         productImages = [singleImage];
                     } else if (p.images) {

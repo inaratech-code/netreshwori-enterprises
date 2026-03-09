@@ -14,19 +14,21 @@ const PRODUCT_IMAGES_BASE_URL_SUFFIX =
 
 /**
  * Converts a Google Drive share link to a direct image URL for <img src>.
- * Supports: drive.google.com/file/d/ID/view, drive.google.com/open?id=ID, drive.google.com/uc?id=ID
- * File must be shared so "Anyone with the link" can view.
+ * Supports: drive.google.com/file/d/ID/view, drive.google.com/open?id=ID, drive.google.com/uc?id=ID,
+ * and links with extra query params (e.g. ?usp=sharing). File must be shared "Anyone with the link".
  */
 export function driveLinkToImageUrl(url: string): string {
-  const trimmed = (url || "").trim();
+  const trimmed = (url || "").trim().replace(/\s+/g, " ");
   const fileIdMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
     trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
   if (!fileIdMatch) return "";
-  return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+  const id = fileIdMatch[1];
+  return `https://drive.google.com/uc?export=view&id=${id}`;
 }
 
 function isDriveLink(url: string): boolean {
-  return /^https?:\/\/(drive\.google\.com|www\.drive\.google\.com)\//.test(url.trim());
+  const u = (url || "").trim();
+  return /^https?:\/\/(drive\.google\.com|www\.drive\.google\.com)\//.test(u) || u.includes("drive.google.com");
 }
 
 /** Dropbox share link → direct image URL (?raw=1). */

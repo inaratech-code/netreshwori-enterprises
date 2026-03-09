@@ -65,9 +65,23 @@ const CSV_HEADER_KEY_MAP: Record<string, string> = {
   image: "image",
   imageurl: "image",
   image_url: "image",
+  imagelink: "image",
+  image_link: "image",
   img: "image",
+  photo: "image",
+  picture: "image",
+  pictureurl: "image",
+  picture_url: "image",
   images: "images",
 };
+
+/** Headers containing these (but not "images") map to "image" so any "Image" / "Image URL" / "Photo" column works. */
+function mapHeaderToImage(rawHeader: string): string | null {
+  const n = rawHeader.toLowerCase().replace(/\s+/g, "");
+  if (n === "images") return "images";
+  if (n.includes("image") || n === "img" || n.includes("photo") || n.includes("picture")) return "image";
+  return null;
+}
 
 export interface CsvProductRow {
   productCode?: string;
@@ -90,9 +104,11 @@ export function parseCsvToProducts(csvText: string): { products: CsvProductRow[]
   if (rows.length < 2) return { products: [] };
 
   const rawHeaders = rows[0].map((h) => h.trim().replace(/^\uFEFF/, ""));
-  const headers = rawHeaders.map(
-    (h) => CSV_HEADER_KEY_MAP[h.toLowerCase().replace(/\s+/g, "")] || h
-  );
+  const headers = rawHeaders.map((h) => {
+    const key = h.toLowerCase().replace(/\s+/g, "");
+    const mapped = CSV_HEADER_KEY_MAP[key] ?? mapHeaderToImage(h) ?? null;
+    return mapped || h;
+  });
   const products: CsvProductRow[] = [];
 
   for (let r = 1; r < rows.length; r++) {
@@ -103,11 +119,11 @@ export function parseCsvToProducts(csvText: string): { products: CsvProductRow[]
       if (!key) continue;
       const val: string | string[] = (row[c] ?? "").trim();
       if (key === "image" && typeof val === "string" && val) {
-        obj["image"] = val;
+        obj["image"] = val.replace(/\s+/g, " ").trim();
         continue;
       }
       if (key === "images" && typeof val === "string" && val) {
-        const urls = val.split(",").map((s) => s.trim()).filter(Boolean);
+        const urls = val.split(/[,\n]+/).map((s) => s.trim()).filter(Boolean);
         if (urls.length > 0) obj["images"] = urls.length === 1 ? urls[0] : urls;
         continue;
       }
