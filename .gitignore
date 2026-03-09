@@ -34,6 +34,10 @@ scripts/service-account.json
 # vercel
 .vercel
 
+# Cloudflare OpenNext build output
+.open-next
+.dev.vars
+
 # typescript
 *.tsbuildinfo
 
