@@ -735,7 +735,8 @@ export default function AdminProductsPage() {
                         || (p as { photo?: string }).photo?.trim()
                         || (p as { picture?: string }).picture?.trim();
                     if (singleImage) {
-                        productImages = [singleImage];
+                        productImages = singleImage.split(/[,\n]+/).map((u) => u.trim()).filter(Boolean);
+                        if (productImages.length === 0) productImages = [singleImage];
                     } else if (p.images) {
                         productImages = Array.isArray(p.images)
                             ? p.images.filter((u) => typeof u === "string" && u.trim())
@@ -1125,11 +1126,11 @@ export default function AdminProductsPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Images</label>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Images (multiple URLs allowed)</label>
                                 <p className="text-xs text-slate-500 mb-2">
                                     {hasImageUploadStorage
-                                        ? "Paste an image URL below and click Add URL, or use Upload. Then Save Product. Some URLs show \"Preview unavailable\" here but still work on the product page."
-                                        : "Add images by pasting image URLs below and click Add URL, then Save Product. Some URLs show \"Preview unavailable\" here but still work on the product page."}
+                                        ? "Paste multiple image URLs below (one per line or comma-separated) and click Add URLs, or use Upload. Then Save Product. Some URLs may show \"Preview unavailable\" here but still work on the product page."
+                                        : "Paste multiple image URLs below (one per line or comma-separated) and click Add URLs, then Save Product. Some URLs may show \"Preview unavailable\" here but still work on the product page."}
                                 </p>
                                 <div className="flex flex-wrap gap-4">
                                     {form.images?.map((img, idx) => (
@@ -1143,30 +1144,27 @@ export default function AdminProductsPage() {
                                         </label>
                                     )}
                                 </div>
-                                <div className="mt-3 flex flex-wrap items-center gap-2">
-                                    <input
-                                        type="text"
+                                <div className="mt-3 space-y-2">
+                                    <label className="block text-xs font-medium text-slate-600">Add image URLs</label>
+                                    <textarea
                                         inputMode="url"
                                         autoComplete="off"
                                         value={imageUrlInput}
                                         onChange={e => setImageUrlInput(e.target.value)}
-                                        onKeyDown={e => {
-                                            if (e.key === "Enter") {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                addImageByUrl();
-                                            }
-                                        }}
-                                        placeholder="Paste one or more URLs (one per line or comma-separated)"
-                                        className="flex-1 min-w-[200px] px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-900 placeholder:text-slate-400"
+                                        rows={4}
+                                        placeholder={"One URL per line or comma-separated:\nhttps://example.com/image1.jpg\nhttps://example.com/image2.jpg"}
+                                        className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-900 placeholder:text-slate-400 resize-y min-h-[80px]"
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={e => addImageByUrl(e)}
-                                        className="px-4 py-2 text-sm font-semibold rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/30"
-                                    >
-                                        Add URL
-                                    </button>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={e => addImageByUrl(e)}
+                                            className="px-4 py-2 text-sm font-semibold rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/30"
+                                        >
+                                            Add URLs
+                                        </button>
+                                        <span className="text-xs text-slate-500">All valid URLs above are added as separate product images.</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -1252,7 +1250,7 @@ export default function AdminProductsPage() {
                         </div>
                         <div className="p-6 overflow-y-auto flex-1 space-y-4">
                             <p className="text-sm text-slate-600">
-                                Upload a <strong>CSV</strong> or <strong>JSON</strong> file, or use a <strong>Google Sheet</strong>. Each product needs <strong>name</strong> and <strong>category</strong>. Optional: <strong>productCode</strong>, <strong>brand</strong>, <strong>size</strong>, <strong>finish</strong>, <strong>image</strong> (full URL or Google Drive link).{hasImageUploadStorage ? " You can also attach image files below (assigned in order)." : ""}
+                                Upload a <strong>CSV</strong> or <strong>JSON</strong> file, or use a <strong>Google Sheet</strong>. Each product needs <strong>name</strong> and <strong>category</strong>. Optional: <strong>productCode</strong>, <strong>brand</strong>, <strong>size</strong>, <strong>finish</strong>, <strong>image</strong> (one or more URLs per product: use one cell with comma/newline-separated URLs, or use multiple columns e.g. <strong>image</strong>, <strong>image 2</strong>, <strong>image 3</strong>).{hasImageUploadStorage ? " You can also attach image files below (assigned in order)." : ""}
                             </p>
                             <div className="space-y-2">
                                 <label className="block text-sm font-semibold text-slate-700">Import from Google Sheet</label>
@@ -1299,7 +1297,7 @@ export default function AdminProductsPage() {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        const csv = "productCode,name,category,brand,size,finish,image\nKAJ-001,Product 1,Ceramic Tiles,Kajaria,60x60 cm,Glossy,https://example.com/image1.jpg\nKAJ-002,Product 2,Ceramic Tiles,Kajaria,30x30 cm,Matt,https://example.com/img1.jpg";
+                                        const csv = "productCode,name,category,brand,size,finish,image\nKAJ-001,Product 1,Ceramic Tiles,Kajaria,60x60 cm,Glossy,https://example.com/image1.jpg\nKAJ-002,Product 2,Ceramic Tiles,Kajaria,30x30 cm,Matt,\"https://example.com/img1.jpg, https://example.com/img2.jpg\"";
                                         const blob = new Blob([csv], { type: "text/csv" });
                                         const a = document.createElement("a");
                                         a.href = URL.createObjectURL(blob);

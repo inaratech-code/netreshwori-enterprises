@@ -114,21 +114,21 @@ export function parseCsvToProducts(csvText: string): { products: CsvProductRow[]
   for (let r = 1; r < rows.length; r++) {
     const row = rows[r];
     const obj: Record<string, unknown> = {};
+    const imageValues: string[] = [];
     for (let c = 0; c < headers.length; c++) {
       const key = headers[c];
       if (!key) continue;
       const val: string | string[] = (row[c] ?? "").trim();
-      if (key === "image" && typeof val === "string" && val) {
-        obj["image"] = val.replace(/\s+/g, " ").trim();
-        continue;
-      }
-      if (key === "images" && typeof val === "string" && val) {
-        const urls = val.split(/[,\n]+/).map((s) => s.trim()).filter(Boolean);
-        if (urls.length > 0) obj["images"] = urls.length === 1 ? urls[0] : urls;
+      if (key === "image" || key === "images") {
+        if (typeof val === "string" && val) {
+          const urls = val.split(/[,\n]+/).map((s) => s.trim()).filter(Boolean);
+          imageValues.push(...urls);
+        }
         continue;
       }
       if (val !== "" && (Array.isArray(val) ? val.length > 0 : true)) obj[key] = val;
     }
+    if (imageValues.length > 0) obj["images"] = imageValues;
     if (Object.keys(obj).length > 0) products.push(obj as CsvProductRow);
   }
   return { products };
