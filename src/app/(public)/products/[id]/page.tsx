@@ -99,11 +99,11 @@ export default function ProductDetailPage() {
 
   const categoryName = product ? categories.find((c) => c.id === product.categoryId)?.name ?? "" : "";
   const brandName = product?.brandId ? brands.find((b) => b.id === product.brandId)?.name ?? "" : "";
-  const rawImages = product?.images;
+  const rawImages = product?.images as string[] | string | undefined;
   const imageValues: string[] = Array.isArray(rawImages)
     ? rawImages.filter((u): u is string => typeof u === "string" && u.trim() !== "")
     : typeof rawImages === "string" && rawImages.trim()
-      ? [rawImages.trim()]
+      ? [String(rawImages).trim()]
       : [];
   const images = imageValues.map(resolveProductImageSrc).filter(Boolean);
   const toDisplayUrl = (url: string) =>
