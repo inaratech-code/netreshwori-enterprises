@@ -31,8 +31,6 @@ yarn-error.log*
 # Firebase service account key (for bulk-import script; do not commit)
 scripts/service-account.json
 
-# vercel
-.vercel
 
 # Cloudflare OpenNext build output
 .open-next

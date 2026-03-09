@@ -1,6 +1,6 @@
 # Deploy to Cloudflare (netreshworienterprises.com.np)
 
-This project is set up to deploy to **Cloudflare Workers** using the [OpenNext Cloudflare adapter](https://opennext.js.org/cloudflare/), so you get full Next.js (API routes, SSR, dynamic routes) on Cloudflare.
+This project deploys to **Cloudflare Workers** via the [OpenNext Cloudflare adapter](https://opennext.js.org/cloudflare/) (full Next.js: API routes, SSR, dynamic routes). `.npmrc` has `legacy-peer-deps=true` so `npm install` works with Next.js 14.
 
 ---
 
@@ -9,9 +9,10 @@ This project is set up to deploy to **Cloudflare Workers** using the [OpenNext C
 From the project root:
 
 ```bash
-npm install @opennextjs/cloudflare@latest
-npm install --save-dev wrangler@latest
+npm install
 ```
+
+(This installs `@opennextjs/cloudflare` and `wrangler` from `package.json`. The repo uses `legacy-peer-deps=true` in `.npmrc` so install works with Next.js 14.)
 
 ---
 

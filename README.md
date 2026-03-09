@@ -62,21 +62,16 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the public site.
 Go to [http://localhost:3000/admin](http://localhost:3000/admin) to access the Admin Panel. (You will need to create a test user in Firebase Auth manually first, or implement a signup route if desired).
 
-### 4. Deployment (Vercel)
+### 4. Deployment (Cloudflare)
 
-The app is set up for deployment on [Vercel](https://vercel.com/).
+The app is set up for deployment on **Cloudflare Workers** (e.g. **netreshworienterprises.com.np**).
 
-1. Push your code to a GitHub (or GitLab/Bitbucket) repository.
-2. In [Vercel](https://vercel.com/), import the repository and create a project.
-3. **Environment variables:** In the project **Settings → Environment Variables**, add the same variables you use in `.env.local`. Use `.env.example` as a checklist. Required for the app to work:
-   - `NEXT_PUBLIC_FIREBASE_API_KEY`
-   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
-   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
-   - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
-   - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
-   - `NEXT_PUBLIC_FIREBASE_APP_ID`
-   Optional: `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`, `NEXT_PUBLIC_ADMIN_EMAILS` (comma-separated), `NEXT_PUBLIC_PRODUCT_IMAGES_BASE_URL`, `NEXT_PUBLIC_PRODUCT_IMAGES_BASE_URL_SUFFIX`.
-4. Deploy. Vercel will run `npm run build` and then serve the app. Do not set `output: 'export'` in `next.config.mjs` unless you intend a static export.
+1. Install dependencies: `npm install`
+2. Set environment variables (see `.env.example`). For production, add them in Cloudflare Dashboard → your Worker → **Settings → Variables and Secrets** (and **Build variables** if using GitHub).
+3. Deploy: `npm run deploy` (builds with OpenNext and deploys via Wrangler).
+4. Add your custom domain in Cloudflare → **Workers & Pages** → your project → **Custom domains**.
+
+See **[DEPLOY_CLOUDFLARE.md](./DEPLOY_CLOUDFLARE.md)** for the full guide (env vars, custom domain, GitHub auto-deploy).
 
 ## Tech Stack
 - Frontend: Next.js 14 (App Router)
