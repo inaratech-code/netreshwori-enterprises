@@ -42,13 +42,14 @@ function toDirectDropboxUrl(url: string): string {
   }
 }
 
-/** If value looks like a URL without protocol, prepend https://. */
+/** If value looks like a URL without protocol, prepend https:// and normalize. */
 function normalizeToFullUrl(value: string): string {
   const s = value.trim();
   if (s.startsWith("http://") || s.startsWith("https://")) return s;
   if (s.startsWith("//")) return "https:" + s;
-  const looksLikeHost = /^www\./i.test(s) || (s.includes("/") && /^[^/]*\.[^/]+/.test(s) && !/\s/.test(s));
-  if (looksLikeHost) return "https://" + s.replace(/^\/+/, "");
+  if (/^www\./i.test(s)) return "https://" + s.replace(/^\/+/, "");
+  if (s.includes("/") && /^[^/]*\.[^/]+/.test(s)) return "https://" + s.replace(/^\/+/, "").replace(/\s/g, "%20");
+  if (s.includes("/") && s.includes(".")) return "https://" + s.replace(/^\/+/, "").replace(/\s/g, "%20");
   return s;
 }
 
@@ -80,18 +81,21 @@ function normalizeFirebaseStorageDownloadUrl(url: string): string {
 
 /**
  * Resolves a product image value to a URL usable in <img src>.
- * - Any URL-like string is accepted (with or without https://; www. and domain/path normalized).
+ * Accepts any format or URL:
+ * - data: and blob: URLs → used as-is.
+ * - Full URLs (http/https) or URL without protocol (https:// added), including with spaces (encoded as %20).
  * - Google Drive share links → converted to direct image URL.
  * - Dropbox share links → converted to direct image (?raw=1).
- * - Firebase Storage URLs → path normalized so GET works (avoids 400 "Invalid HTTP method/URL pair").
- * - Other full URLs → used as-is.
- * - If value is a filename (no URL shape) and NEXT_PUBLIC_PRODUCT_IMAGES_BASE_URL is set,
- *   returns base URL + encoded filename + optional suffix.
+ * - Firebase Storage URLs → path normalized so GET works (avoids 400).
+ * - Other URLs (OneDrive, SharePoint, CDNs, etc.) → used as-is (with https if missing).
+ * - Filename only (e.g. "photo.jpg") when NEXT_PUBLIC_PRODUCT_IMAGES_BASE_URL is set → base + encoded filename + suffix.
  */
 export function resolveProductImageSrc(value: string): string {
   if (!value || typeof value !== "string") return "";
   const trimmed = value.trim();
   if (!trimmed) return "";
+
+  if (trimmed.startsWith("data:") || trimmed.startsWith("blob:")) return trimmed;
 
   const withProtocol = normalizeToFullUrl(trimmed);
   const isFullUrl = withProtocol.startsWith("http://") || withProtocol.startsWith("https://");
