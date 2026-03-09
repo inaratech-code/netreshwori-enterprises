@@ -117,3 +117,14 @@ export function resolveProductImageSrc(value: string): string {
   if (built.includes("firebasestorage.googleapis.com")) return normalizeFirebaseStorageDownloadUrl(built);
   return built;
 }
+
+/** Whether this image URL should be loaded via our proxy (Drive/Dropbox) to avoid CORS/embed blocking. */
+export function isProxyableImageUrl(url: string): boolean {
+  if (!url || typeof url !== "string") return false;
+  const u = url.trim();
+  return (
+    u.includes("drive.google.com") ||
+    u.includes("dropbox.com") ||
+    u.includes("lh3.googleusercontent.com")
+  );
+}

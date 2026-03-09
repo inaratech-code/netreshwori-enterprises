@@ -7,7 +7,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { getProduct, getCategories, getBrands, getSimilarProducts, getProductsPaginated } from "@/lib/admin/firestore";
 import type { Product, Category, Brand } from "@/lib/admin/types";
-import { resolveProductImageSrc } from "@/lib/utils";
+import { resolveProductImageSrc, isProxyableImageUrl } from "@/lib/utils";
 import ProductCard from "@/components/product/ProductCard";
 
 const MORE_PRODUCTS_LIMIT = 8;
@@ -102,9 +102,13 @@ export default function ProductDetailPage() {
   const rawImages = product?.images;
   const imageValues: string[] = Array.isArray(rawImages)
     ? rawImages.filter((u): u is string => typeof u === "string" && u.trim() !== "")
-    : [];
+    : typeof rawImages === "string" && rawImages.trim()
+      ? [rawImages.trim()]
+      : [];
   const images = imageValues.map(resolveProductImageSrc).filter(Boolean);
-  const imgSrc = images[activeImage] ?? images[0];
+  const toDisplayUrl = (url: string) =>
+    url && isProxyableImageUrl(url) ? `/api/image-proxy?url=${encodeURIComponent(url)}` : url;
+  const imgSrc = toDisplayUrl(images[activeImage] ?? images[0] ?? "");
 
   if (loading) {
     return (
@@ -178,7 +182,7 @@ export default function ProductDetailPage() {
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element -- dynamic product gallery URL */}
                     <img
-                      src={img}
+                      src={toDisplayUrl(img)}
                       alt=""
                       className="absolute inset-0 w-full h-full object-cover"
                     />

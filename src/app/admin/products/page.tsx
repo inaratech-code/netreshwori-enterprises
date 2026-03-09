@@ -14,7 +14,7 @@ import { compressImage } from "@/lib/imageCompression";
 import { parseCsvToProducts } from "@/lib/parseCsv";
 import { PARTNER_BRAND_NAMES } from "@/data/partners";
 import { deleteAllProducts } from "@/lib/admin/firestore";
-import { resolveProductImageSrc } from "@/lib/utils";
+import { resolveProductImageSrc, isProxyableImageUrl } from "@/lib/utils";
 import { sanitizeStorageFileName } from "@/lib/admin/storage";
 
 /** Thumbnail in Add/Edit form: resolves URL (e.g. Drive), shows preview or "Couldn't load" on error. */
@@ -65,6 +65,9 @@ function FormImageThumb({ url, onRemove }: { url: string; onRemove: () => void }
 function ProductRowThumbnail({ src }: { src: string | undefined }) {
   const resolved = src ? resolveProductImageSrc(src) : "";
   const [failed, setFailed] = useState(false);
+  const imgSrc = resolved && isProxyableImageUrl(resolved)
+    ? `/api/image-proxy?url=${encodeURIComponent(resolved)}`
+    : resolved;
   if (!src || !resolved || failed) {
     return (
       <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
@@ -75,7 +78,7 @@ function ProductRowThumbnail({ src }: { src: string | undefined }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element -- table thumbnail, dynamic URL
     <img
-      src={resolved}
+      src={imgSrc}
       alt=""
       loading="lazy"
       decoding="async"
@@ -275,7 +278,13 @@ export default function AdminProductsPage() {
                 const docs = productsSnapshot.docs;
                 const hasMore = docs.length > INITIAL_PRODUCTS_LIMIT;
                 const productDocs = hasMore ? docs.slice(0, INITIAL_PRODUCTS_LIMIT) : docs;
-                const productsList = productDocs.map(d => ({ id: d.id, ...d.data() } as Product));
+                const productsList = productDocs.map(d => {
+                    const data = d.data();
+                    const images = data.images == null ? undefined : Array.isArray(data.images)
+                        ? (data.images as string[]).filter((u): u is string => typeof u === "string" && !!String(u).trim())
+                        : [String(data.images).trim()].filter(Boolean);
+                    return { id: d.id, ...data, images } as Product;
+                });
                 const lastDoc = productDocs.length > 0 ? productDocs[productDocs.length - 1] : null;
                 setProducts(productsList);
                 setLastProductDoc(lastDoc);
@@ -288,7 +297,13 @@ export default function AdminProductsPage() {
                 const docs = productsSnapshot.docs;
                 const hasMore = docs.length > INITIAL_PRODUCTS_LIMIT;
                 const productDocs = hasMore ? docs.slice(0, INITIAL_PRODUCTS_LIMIT) : docs;
-                const newProducts = productDocs.map(d => ({ id: d.id, ...d.data() } as Product));
+                const newProducts = productDocs.map(d => {
+                    const data = d.data();
+                    const images = data.images == null ? undefined : Array.isArray(data.images)
+                        ? (data.images as string[]).filter((u): u is string => typeof u === "string" && !!String(u).trim())
+                        : [String(data.images).trim()].filter(Boolean);
+                    return { id: d.id, ...data, images } as Product;
+                });
                 const lastDoc = productDocs.length > 0 ? productDocs[productDocs.length - 1] : null;
                 setProducts(prev => [...prev, ...newProducts]);
                 setLastProductDoc(lastDoc);

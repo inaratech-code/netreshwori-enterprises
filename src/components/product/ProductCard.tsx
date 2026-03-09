@@ -4,7 +4,7 @@ import { useState, memo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Star, MessageCircle } from "lucide-react";
-import { cn, resolveProductImageSrc } from "@/lib/utils";
+import { cn, resolveProductImageSrc, isProxyableImageUrl } from "@/lib/utils";
 
 const WHATSAPP_NUMBER = "9779864320452";
 
@@ -52,7 +52,10 @@ interface ProductCardProps {
 function ProductCardInner({ product, priority = false, queryParams }: ProductCardProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const rawImg = getFirstImageValue(product.images);
-  const imgSrc = resolveProductImageSrc(rawImg);
+  const resolved = resolveProductImageSrc(rawImg);
+  const imgSrc = resolved && isProxyableImageUrl(resolved)
+    ? `/api/image-proxy?url=${encodeURIComponent(resolved)}`
+    : resolved;
   const showImg = imgSrc && !imgFailed;
   const search = new URLSearchParams();
   if (queryParams?.category) search.set("category", queryParams.category);
