@@ -29,21 +29,52 @@ function isDriveLink(url: string): boolean {
   return /^https?:\/\/(drive\.google\.com|www\.drive\.google\.com)\//.test(url.trim());
 }
 
+/** Dropbox share link → direct image URL (?raw=1). */
+function toDirectDropboxUrl(url: string): string {
+  const u = url.trim();
+  if (!/dropbox\.com\//.test(u)) return u;
+  try {
+    const parsed = new URL(u.startsWith("http") ? u : "https://" + u);
+    parsed.searchParams.set("raw", "1");
+    return parsed.toString();
+  } catch {
+    return u;
+  }
+}
+
+/** If value looks like a URL without protocol, prepend https://. */
+function normalizeToFullUrl(value: string): string {
+  const s = value.trim();
+  if (s.startsWith("http://") || s.startsWith("https://")) return s;
+  if (s.startsWith("//")) return "https:" + s;
+  const looksLikeHost = /^www\./i.test(s) || (s.includes("/") && /^[^/]*\.[^/]+/.test(s) && !/\s/.test(s));
+  if (looksLikeHost) return "https://" + s.replace(/^\/+/, "");
+  return s;
+}
+
 /**
  * Resolves a product image value to a URL usable in <img src>.
- * - Google Drive links → converted to direct image URL (uc?export=view&id=...).
- * - Other full URLs (http/https) → used as-is.
- * - If value is a filename and NEXT_PUBLIC_PRODUCT_IMAGES_BASE_URL is set,
- *   returns base URL + encoded filename + optional suffix (e.g. ?alt=media for Firebase Storage).
+ * - Any URL-like string is accepted (with or without https://; www. and domain/path normalized).
+ * - Google Drive share links → converted to direct image URL.
+ * - Dropbox share links → converted to direct image (?raw=1).
+ * - Other full URLs → used as-is.
+ * - If value is a filename (no URL shape) and NEXT_PUBLIC_PRODUCT_IMAGES_BASE_URL is set,
+ *   returns base URL + encoded filename + optional suffix.
  */
 export function resolveProductImageSrc(value: string): string {
   if (!value || typeof value !== "string") return "";
   const trimmed = value.trim();
   if (!trimmed) return "";
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    if (isDriveLink(trimmed)) return driveLinkToImageUrl(trimmed);
-    return trimmed;
+
+  const withProtocol = normalizeToFullUrl(trimmed);
+  const isFullUrl = withProtocol.startsWith("http://") || withProtocol.startsWith("https://");
+
+  if (isFullUrl) {
+    if (isDriveLink(withProtocol)) return driveLinkToImageUrl(withProtocol);
+    if (/dropbox\.com\//.test(withProtocol)) return toDirectDropboxUrl(withProtocol);
+    return withProtocol;
   }
+
   const base = (PRODUCT_IMAGES_BASE_URL || "").trim();
   if (!base) return "";
   const baseWithSlash = base.endsWith("/") ? base : base + "/";
