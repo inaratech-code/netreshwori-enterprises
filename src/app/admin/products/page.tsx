@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo, startTransition, useCallback } from "react";
+import { useState, useEffect, useRef, useMemo, startTransition, useCallback, memo } from "react";
 import { Package, Plus, Edit2, Trash2, Search, Loader2, ImagePlus, X, Upload, FileJson, Download, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { db, storage } from "@/lib/firebase";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, limit, startAfter, where, writeBatch } from "firebase/firestore";
@@ -97,7 +97,7 @@ interface ProductRowProps {
   onToggleStatus: (id: string, status: string) => void;
 }
 
-const ProductTableRow = React.memo(function ProductTableRow({
+const ProductTableRow = memo(function ProductTableRow({
   p,
   getCategoryName,
   getBrandName,
