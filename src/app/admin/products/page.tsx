@@ -1230,7 +1230,7 @@ export default function AdminProductsPage() {
                             </p>
                             <div className="space-y-2">
                                 <label className="block text-sm font-semibold text-slate-700">Import from Google Sheet</label>
-                                <p className="text-xs text-slate-500">In Google Sheets: File → Share → Publish to web → Link tab → choose <strong>Comma-separated values (.csv)</strong> → Publish, then copy the link and paste below.</p>
+                                <p className="text-xs text-slate-500">Paste the sheet link (edit or view URL is fine). Sheet must be shared so <strong>Anyone with the link</strong> can view, or use File → Share → Publish to web → CSV and paste that link.</p>
                                 <div className="flex flex-wrap gap-2">
                                     <input
                                         type="url"

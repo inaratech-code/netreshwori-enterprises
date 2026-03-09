@@ -2,6 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 
 const ALLOWED_HOSTS = ["docs.google.com", "www.googleapis.com"];
 
+/**
+ * Convert a Google Sheet edit/view link to the public CSV export URL.
+ * Edit links require auth and return 401; export?format=csv works when sheet is shared "Anyone with the link".
+ */
+function toGoogleSheetCsvExportUrl(url: string): string {
+  const trimmed = url.trim();
+  const match = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (!match) return trimmed;
+  const spreadsheetId = match[1];
+  const gidMatch = trimmed.match(/[?&]gid=(\d+)/);
+  const gid = gidMatch ? gidMatch[1] : "0";
+  return `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`;
+}
+
+function isGoogleSheetEditOrViewUrl(parsed: URL): boolean {
+  const path = parsed.pathname.toLowerCase();
+  return (
+    parsed.hostname.toLowerCase().replace(/^www\./, "") === "docs.google.com" &&
+    /\/spreadsheets\/d\/[a-zA-Z0-9_-]+(\/(edit|view)(\b|$)|$)/.test(path)
+  );
+}
+
 export async function GET(request: NextRequest) {
   const urlParam = request.nextUrl.searchParams.get("url");
   if (!urlParam?.trim()) {
@@ -22,16 +44,22 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  let fetchUrl = parsed.toString();
+  if (isGoogleSheetEditOrViewUrl(parsed)) {
+    fetchUrl = toGoogleSheetCsvExportUrl(parsed.toString());
+  }
+
   try {
-    const res = await fetch(parsed.toString(), {
+    const res = await fetch(fetchUrl, {
       headers: { "User-Agent": "Netreshwori-Website/1.0" },
       next: { revalidate: 0 },
     });
     if (!res.ok) {
-      return NextResponse.json(
-        { error: `Fetch failed: ${res.status}` },
-        { status: 502 }
-      );
+      const message =
+        res.status === 401
+          ? "Sheet is private. Share it: open the sheet → Share → set to “Anyone with the link” can view, then try again."
+          : `Fetch failed: ${res.status}`;
+      return NextResponse.json({ error: message }, { status: 502 });
     }
     const text = await res.text();
     return new NextResponse(text, {
