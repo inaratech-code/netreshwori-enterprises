@@ -51,8 +51,8 @@ export default function Navbar() {
                 "fixed top-0 w-full z-50 transition-all duration-300",
                 !visible && "-translate-y-full",
                 isScrolledOrNotHome
-                    ? "bg-transparent py-1.5"
-                    : "bg-transparent py-2"
+                    ? "bg-transparent py-0.5"
+                    : "bg-transparent py-1"
             )}
         >
             <div className="container mx-auto px-4">
@@ -67,7 +67,7 @@ export default function Navbar() {
                             alt="Netreshwori Enterprises"
                             width={440}
                             height={110}
-                            className="h-24 w-auto sm:h-28 md:h-32 lg:h-36 object-contain drop-shadow-sm"
+                            className="h-20 w-auto sm:h-24 md:h-28 lg:h-32 object-contain drop-shadow-sm"
                             priority
                         />
                     </Link>
