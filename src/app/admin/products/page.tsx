@@ -15,6 +15,8 @@ import { parseCsvToProducts } from "@/lib/parseCsv";
 import { PARTNER_BRAND_NAMES } from "@/data/partners";
 import { deleteAllProducts } from "@/lib/admin/firestore";
 import { resolveProductImageSrc } from "@/lib/utils";
+import { sanitizeStorageFileName } from "@/lib/admin/storage";
+import { sanitizeStorageFileName } from "@/lib/admin/storage";
 
 /** Thumbnail in Add/Edit form: resolves URL (e.g. Drive), shows preview or "Couldn't load" on error. */
 function FormImageThumb({ url, onRemove }: { url: string; onRemove: () => void }) {
@@ -325,7 +327,7 @@ export default function AdminProductsPage() {
                     if (!isImage) throw new Error("Please select image files (e.g. JPG, PNG, WebP).");
                 }
 
-                const name = (file.name.replace(/\.[^.]+$/, "") || "image") + "." + ext;
+                const name = sanitizeStorageFileName((file.name.replace(/\.[^.]+$/, "") || "image") + "." + ext);
                 const storageRef = ref(storage, `products/${Date.now()}_${name}`);
                 const metadata: UploadMetadata = { contentType };
                 const uploadTask = await uploadBytesResumable(storageRef, data, metadata);
@@ -645,7 +647,7 @@ export default function AdminProductsPage() {
             if (bulkImageFiles.length > 0) {
                 try {
                     const uploads = bulkImageFiles.map(async (file) => {
-                        const storageRef = ref(storage, `products/${Date.now()}_${Math.random().toString(36).slice(2)}_${file.name}`);
+                        const storageRef = ref(storage, `products/${Date.now()}_${Math.random().toString(36).slice(2)}_${sanitizeStorageFileName(file.name)}`);
                         const metadata: UploadMetadata = { contentType: file.type || "image/jpeg" };
                         const uploadTask = await uploadBytesResumable(storageRef, file, metadata);
                         return getDownloadURL(uploadTask.ref);

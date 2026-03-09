@@ -5,6 +5,7 @@ import { Plus, Trash2, CheckCircle, XCircle, Search, X, Star } from "lucide-reac
 import { db, storage } from "@/lib/firebase";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { sanitizeStorageFileName } from "@/lib/admin/storage";
 import toast from "react-hot-toast";
 import { useAdminCache } from "../AdminCacheContext";
 
@@ -68,7 +69,7 @@ export default function AdminTestimonialsPage() {
         if (!file) return;
         setUploadingPhoto(true);
         try {
-            const storageRef = ref(storage, `testimonials/${Date.now()}_${file.name}`);
+            const storageRef = ref(storage, `testimonials/${Date.now()}_${sanitizeStorageFileName(file.name)}`);
             await uploadBytesResumable(storageRef, file);
             const url = await getDownloadURL(storageRef);
             setForm((prev) => ({ ...prev, photo: url }));
