@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { ChevronRight, Share2, Heart, MessageCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +11,61 @@ import { resolveProductImageSrc, isProxyableImageUrl } from "@/lib/utils";
 import ProductCard from "@/components/product/ProductCard";
 
 const MORE_PRODUCTS_LIMIT = 8;
+const MAGNIFIER_SIZE = 140;
+const MAGNIFIER_ZOOM = 2.2;
+
+function ImageMagnifier({ src, alt, className, onError }: { src: string; alt: string; className?: string; onError?: () => void }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [show, setShow] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [container, setContainer] = useState({ width: 0, height: 0, left: 0, top: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setContainer({ width: rect.width, height: rect.height, left: rect.left, top: rect.top });
+    setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    setShow(true);
+  };
+
+  const handleMouseLeave = () => setShow(false);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative cursor-crosshair select-none"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- magnifier image */}
+      <img src={src} alt={alt} className={className} draggable={false} onError={onError} />
+      {show && container.width > 0 && (
+        <div
+          className="pointer-events-none absolute z-10 rounded-full border-2 border-white bg-slate-100 shadow-xl overflow-hidden"
+          style={{
+            width: MAGNIFIER_SIZE,
+            height: MAGNIFIER_SIZE,
+            left: Math.max(0, Math.min(pos.x - MAGNIFIER_SIZE / 2, container.width - MAGNIFIER_SIZE)),
+            top: Math.max(0, Math.min(pos.y - MAGNIFIER_SIZE / 2, container.height - MAGNIFIER_SIZE)),
+          }}
+        >
+          <div
+            className="absolute rounded-full"
+            style={{
+              width: container.width * MAGNIFIER_ZOOM,
+              height: container.height * MAGNIFIER_ZOOM,
+              left: -(pos.x * MAGNIFIER_ZOOM - MAGNIFIER_SIZE / 2),
+              top: -(pos.y * MAGNIFIER_ZOOM - MAGNIFIER_SIZE / 2),
+              backgroundImage: `url(${src})`,
+              backgroundSize: `${container.width * MAGNIFIER_ZOOM}px ${container.height * MAGNIFIER_ZOOM}px`,
+              backgroundPosition: "0 0",
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -154,17 +209,21 @@ export default function ProductDetailPage() {
               className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-200"
             >
               {imgSrc && !mainImageFailed ? (
-                // eslint-disable-next-line @next/next/no-img-element -- dynamic product image URL
-                <img
+                <ImageMagnifier
                   src={imgSrc}
                   alt={product.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  className="absolute inset-0 w-full h-full object-cover"
                   onError={() => setMainImageFailed(true)}
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-slate-400">
                   No image
                 </div>
+              )}
+              {imgSrc && !mainImageFailed && (
+                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 text-white text-xs font-medium pointer-events-none hidden sm:block">
+                  Hover to zoom
+                </span>
               )}
             </motion.div>
             {images.length > 1 && (

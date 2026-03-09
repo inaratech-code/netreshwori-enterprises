@@ -102,47 +102,47 @@ function ProductCardInner({ product, priority = false, queryParams }: ProductCar
           </div>
         )}
         {product.category && (
-          <div className="absolute top-4 left-4 flex flex-col gap-2">
-            <span className="bg-card/90 backdrop-blur-sm text-foreground text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-border">
+          <div className="absolute top-2 sm:top-4 left-2 sm:left-4 flex flex-col gap-2">
+            <span className="bg-card/90 backdrop-blur-sm text-foreground text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full uppercase tracking-wider border border-border">
               {product.category}
             </span>
           </div>
         )}
       </Link>
 
-      <div className="p-6 flex flex-col flex-1">
-        <div className="flex justify-between items-start mb-2 gap-2">
-          <Link href={productHref}>
-            <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1">
+      <div className="p-4 sm:p-6 flex flex-col flex-1 min-w-0">
+        <div className="flex justify-between items-start mb-2 gap-2 min-w-0">
+          <Link href={productHref} className="min-w-0 flex-1">
+            <h3 className="font-bold text-sm sm:text-lg text-foreground group-hover:text-primary transition-colors line-clamp-2 break-words">
               {product.name}
             </h3>
           </Link>
           {typeof product.rating === "number" && (
             <div className="flex items-center gap-1 shrink-0 text-amber-400">
-              <Star className="w-4 h-4 fill-amber-400" />
-              <span className="text-sm font-medium text-muted-foreground">{product.rating.toFixed(1)}</span>
+              <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-amber-400" />
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground">{product.rating.toFixed(1)}</span>
             </div>
           )}
         </div>
 
-        <div className="text-muted-foreground text-sm space-y-1 mb-4">
-          {product.brand && <p className="line-clamp-1"><span className="font-medium text-foreground/80">Brand:</span> {product.brand}</p>}
-          {(product.productCode ?? "").trim() && <p className="line-clamp-1"><span className="font-medium text-foreground/80">Code:</span> {product.productCode}</p>}
+        <div className="text-muted-foreground text-xs sm:text-sm space-y-0.5 sm:space-y-1 mb-3 sm:mb-4 min-w-0">
+          {product.brand && <p className="line-clamp-2 break-words"><span className="font-medium text-foreground/80">Brand:</span> {product.brand}</p>}
+          {(product.productCode ?? "").trim() && <p className="line-clamp-1 break-words"><span className="font-medium text-foreground/80">Code:</span> {product.productCode}</p>}
         </div>
 
-        <div className="mt-auto pt-4 border-t border-border flex flex-col sm:flex-row gap-3">
+        <div className="mt-auto pt-3 sm:pt-4 border-t border-border flex flex-col sm:flex-row gap-2 sm:gap-3">
           <a
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildWhatsAppMessage(product.name, product.brand, product.productCode ?? ""))}`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-green-500 hover:bg-green-600 text-white text-xs sm:text-sm font-semibold py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl transition-colors"
           >
-            <MessageCircle className="w-4 h-4 shrink-0" />
+            <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             WhatsApp
           </a>
           <Link
             href={productHref}
-            className="inline-flex items-center justify-center text-primary text-sm font-bold hover:underline underline-offset-4 transition-colors py-2.5"
+            className="inline-flex items-center justify-center text-primary text-xs sm:text-sm font-bold hover:underline underline-offset-4 transition-colors py-2 sm:py-2.5"
           >
             View Details →
           </Link>

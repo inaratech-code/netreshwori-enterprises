@@ -389,7 +389,7 @@ function ProductsContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-12">
               {loading ? (
                 Array.from({ length: PAGE_SIZE }).map((_, i) => <ProductCardSkeleton key={i} />)
               ) : (
@@ -480,7 +480,7 @@ function ProductsFallback() {
         <Skeleton className="h-5 w-96 mb-12" />
         <div className="flex gap-8">
           <Skeleton className="w-64 h-80 rounded-2xl shrink-0" />
-          <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))}
