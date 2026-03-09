@@ -16,14 +16,6 @@ function toGoogleSheetCsvExportUrl(url: string): string {
   return `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`;
 }
 
-function isGoogleSheetEditOrViewUrl(parsed: URL): boolean {
-  const path = parsed.pathname.toLowerCase();
-  return (
-    parsed.hostname.toLowerCase().replace(/^www\./, "") === "docs.google.com" &&
-    /\/spreadsheets\/d\/[a-zA-Z0-9_-]+(\/(edit|view)(\b|$)|$)/.test(path)
-  );
-}
-
 export async function GET(request: NextRequest) {
   const urlParam = request.nextUrl.searchParams.get("url");
   if (!urlParam?.trim()) {
@@ -45,7 +37,7 @@ export async function GET(request: NextRequest) {
   }
 
   let fetchUrl = parsed.toString();
-  if (isGoogleSheetEditOrViewUrl(parsed)) {
+  if (parsed.hostname.toLowerCase().replace(/^www\./, "") === "docs.google.com" && /\/spreadsheets\/d\/[a-zA-Z0-9_-]+/.test(parsed.pathname)) {
     fetchUrl = toGoogleSheetCsvExportUrl(parsed.toString());
   }
 
@@ -58,7 +50,9 @@ export async function GET(request: NextRequest) {
       const message =
         res.status === 401
           ? "Sheet is private. Share it: open the sheet → Share → set to “Anyone with the link” can view, then try again."
-          : `Fetch failed: ${res.status}`;
+          : res.status === 400
+            ? "Sheet link may be incomplete or invalid. Copy the full URL from the browser address bar and ensure the sheet is shared (Anyone with the link can view)."
+            : `Fetch failed: ${res.status}`;
       return NextResponse.json({ error: message }, { status: 502 });
     }
     const text = await res.text();

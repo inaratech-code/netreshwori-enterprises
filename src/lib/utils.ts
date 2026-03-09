@@ -53,10 +53,37 @@ function normalizeToFullUrl(value: string): string {
 }
 
 /**
+ * Firebase Storage returns 400 "Invalid HTTP method/URL pair" when the object path in the URL
+ * contains unencoded slashes. Download URL must be: .../o/PATH_ENCODED?alt=media (e.g. products%2Fimg.jpg).
+ */
+function normalizeFirebaseStorageDownloadUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.includes("firebasestorage.googleapis.com") || !parsed.pathname.startsWith("/v0/b/"))
+      return url;
+    const match = parsed.pathname.match(/^(\/v0\/b\/[^/]+\/o\/)(.+)$/);
+    if (!match) return url;
+    const prefix = match[1];
+    const pathSegment = match[2];
+    try {
+      const decoded = decodeURIComponent(pathSegment);
+      const encoded = decoded.split("/").map(segment => encodeURIComponent(segment)).join("%2F");
+      const path = prefix + encoded;
+      return `${parsed.origin}${path}?alt=media`;
+    } catch {
+      return url;
+    }
+  } catch {
+    return url;
+  }
+}
+
+/**
  * Resolves a product image value to a URL usable in <img src>.
  * - Any URL-like string is accepted (with or without https://; www. and domain/path normalized).
  * - Google Drive share links → converted to direct image URL.
  * - Dropbox share links → converted to direct image (?raw=1).
+ * - Firebase Storage URLs → path normalized so GET works (avoids 400 "Invalid HTTP method/URL pair").
  * - Other full URLs → used as-is.
  * - If value is a filename (no URL shape) and NEXT_PUBLIC_PRODUCT_IMAGES_BASE_URL is set,
  *   returns base URL + encoded filename + optional suffix.
@@ -72,6 +99,7 @@ export function resolveProductImageSrc(value: string): string {
   if (isFullUrl) {
     if (isDriveLink(withProtocol)) return driveLinkToImageUrl(withProtocol);
     if (/dropbox\.com\//.test(withProtocol)) return toDirectDropboxUrl(withProtocol);
+    if (withProtocol.includes("firebasestorage.googleapis.com")) return normalizeFirebaseStorageDownloadUrl(withProtocol);
     return withProtocol;
   }
 
