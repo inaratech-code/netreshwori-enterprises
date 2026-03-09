@@ -38,8 +38,9 @@ function FormImageThumb({ url, onRemove }: { url: string; onRemove: () => void }
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 text-slate-500 text-[10px] p-1 text-center">
           {src && failed ? (
             <>
-              <span>Couldn&apos;t load</span>
-              <a href={src} target="_blank" rel="noopener noreferrer" className="mt-0.5 text-primary underline" onClick={e => e.stopPropagation()}>Open link</a>
+              <span>Preview unavailable</span>
+              <span className="text-[9px] opacity-80 mt-0.5">May still work on site</span>
+              <a href={src} target="_blank" rel="noopener noreferrer" className="mt-1 text-primary font-medium underline" onClick={e => e.stopPropagation()}>Open link</a>
             </>
           ) : (
             "No preview"
@@ -1105,7 +1106,7 @@ export default function AdminProductsPage() {
 
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">Images</label>
-                                <p className="text-xs text-slate-500 mb-2">Paste an image URL below and click <strong>Add URL</strong>, then <strong>Save Product</strong>. (Upload requires Firebase Storage.)</p>
+                                <p className="text-xs text-slate-500 mb-2">Paste an image URL below and click <strong>Add URL</strong>, then <strong>Save Product</strong>. (Upload requires Firebase Storage.) Some URLs show &quot;Preview unavailable&quot; here but still work on the product page.</p>
                                 <div className="flex flex-wrap gap-4">
                                     {form.images?.map((img, idx) => (
                                         <FormImageThumb key={idx} url={img} onRemove={() => removeImage(idx)} />
