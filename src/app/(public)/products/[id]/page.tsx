@@ -341,11 +341,11 @@ export default function ProductDetailPage() {
 
         <section className="border-t border-slate-200 pt-16">
           <h2 className="text-2xl font-bold text-white mb-2">More products</h2>
-          <p className="text-slate-400 text-sm mb-8">
+          <p className="text-slate-200 text-sm mb-8">
             Matches your filter or same category and brand as this product.
           </p>
           {moreProductsLoading ? (
-            <div className="flex items-center gap-2 text-slate-400 py-8">
+            <div className="flex items-center gap-2 text-slate-200 py-8">
               <Loader2 className="w-6 h-6 animate-spin" />
               <span>Loading more products...</span>
             </div>
@@ -373,7 +373,7 @@ export default function ProductDetailPage() {
               })}
             </div>
           ) : (
-            <p className="text-slate-400 text-sm py-8">No other products to show right now.</p>
+            <p className="text-slate-200 text-sm py-8">No other products to show right now.</p>
           )}
         </section>
       </div>
