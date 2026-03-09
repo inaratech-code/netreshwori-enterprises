@@ -107,5 +107,7 @@ export function resolveProductImageSrc(value: string): string {
   if (!base) return "";
   const baseWithSlash = base.endsWith("/") ? base : base + "/";
   const suffix = (PRODUCT_IMAGES_BASE_URL_SUFFIX || "").trim();
-  return baseWithSlash + encodeURIComponent(trimmed) + suffix;
+  const built = baseWithSlash + encodeURIComponent(trimmed) + suffix;
+  if (built.includes("firebasestorage.googleapis.com")) return normalizeFirebaseStorageDownloadUrl(built);
+  return built;
 }
