@@ -33,7 +33,7 @@ function ImageMagnifier({ src, alt, className, onError }: { src: string; alt: st
   return (
     <div
       ref={containerRef}
-      className="relative cursor-crosshair select-none"
+      className="absolute inset-0 w-full h-full relative cursor-crosshair select-none"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
@@ -41,7 +41,7 @@ function ImageMagnifier({ src, alt, className, onError }: { src: string; alt: st
       <img src={src} alt={alt} className={className} draggable={false} onError={onError} />
       {show && container.width > 0 && (
         <div
-          className="pointer-events-none absolute z-10 rounded-full border-2 border-white bg-slate-100 shadow-xl overflow-hidden"
+          className="pointer-events-none absolute z-10 rounded-full border-2 border-white bg-white/80 shadow-xl overflow-hidden"
           style={{
             width: MAGNIFIER_SIZE,
             height: MAGNIFIER_SIZE,
@@ -50,7 +50,7 @@ function ImageMagnifier({ src, alt, className, onError }: { src: string; alt: st
           }}
         >
           <div
-            className="absolute rounded-full"
+            className="absolute rounded-full bg-cover bg-no-repeat"
             style={{
               width: container.width * MAGNIFIER_ZOOM,
               height: container.height * MAGNIFIER_ZOOM,
