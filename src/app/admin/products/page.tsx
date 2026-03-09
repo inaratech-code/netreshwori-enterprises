@@ -16,7 +16,6 @@ import { PARTNER_BRAND_NAMES } from "@/data/partners";
 import { deleteAllProducts } from "@/lib/admin/firestore";
 import { resolveProductImageSrc } from "@/lib/utils";
 import { sanitizeStorageFileName } from "@/lib/admin/storage";
-import { sanitizeStorageFileName } from "@/lib/admin/storage";
 
 /** Thumbnail in Add/Edit form: resolves URL (e.g. Drive), shows preview or "Couldn't load" on error. */
 function FormImageThumb({ url, onRemove }: { url: string; onRemove: () => void }) {
