@@ -167,7 +167,7 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="bg-brand-gradient min-h-screen pt-24 pb-16 flex items-center justify-center">
+      <div className="bg-brand-gradient min-h-screen pt-44 sm:pt-48 pb-16 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 animate-spin text-primary" />
           <p className="text-muted-foreground">Loading product...</p>
@@ -178,7 +178,7 @@ export default function ProductDetailPage() {
 
   if (notFound || !product) {
     return (
-      <div className="bg-brand-gradient min-h-screen pt-24 pb-16">
+      <div className="bg-brand-gradient min-h-screen pt-44 sm:pt-48 pb-16">
         <div className="container mx-auto px-4 py-24 text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Product not found</h1>
           <Link href="/products" className="text-primary font-medium hover:underline">
@@ -190,9 +190,9 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="bg-brand-gradient min-h-screen pt-24 pb-16">
+    <div className="bg-brand-gradient min-h-screen pt-44 sm:pt-48 pb-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="flex text-slate-400 text-sm mb-8 font-medium">
+        <nav className="flex text-slate-400 text-sm mb-8 font-medium flex-wrap items-center gap-y-1">
           <Link href="/" className="hover:text-primary transition-colors">Home</Link>
           <ChevronRight className="w-4 h-4 mx-2" />
           <Link href="/products" className="hover:text-primary transition-colors">Products</Link>

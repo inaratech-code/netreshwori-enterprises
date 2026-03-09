@@ -17,7 +17,7 @@ const PRODUCT_IMAGES_BASE_URL_SUFFIX =
  * Supports: drive.google.com/file/d/ID/view, drive.google.com/open?id=ID, drive.google.com/uc?id=ID,
  * and links with extra query params (e.g. ?usp=sharing). File must be shared "Anyone with the link".
  */
-export function driveLinkToImageUrl(url: string): string {
+function driveLinkToImageUrl(url: string): string {
   const trimmed = (url || "").trim().replace(/\s+/g, " ");
   const fileIdMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
     trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
