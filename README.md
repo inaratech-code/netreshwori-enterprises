@@ -62,16 +62,23 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the public site.
 Go to [http://localhost:3000/admin](http://localhost:3000/admin) to access the Admin Panel. (You will need to create a test user in Firebase Auth manually first, or implement a signup route if desired).
 
-### 4. Deployment (Cloudflare)
+### 4. Deployment (Cloudflare or Vercel)
 
-The app is set up for deployment on **Cloudflare Workers** (e.g. **netreshworienterprises.com.np**).
+You can deploy to **both** Cloudflare and Vercel; the same repo works on either.
 
-1. Install dependencies: `npm install`
-2. Set environment variables (see `.env.example`). For production, add them in Cloudflare Dashboard → your Worker → **Settings → Variables and Secrets** (and **Build variables** if using GitHub).
-3. Deploy: `npm run deploy` (builds with OpenNext and deploys via Wrangler).
-4. Add your custom domain in Cloudflare → **Workers & Pages** → your project → **Custom domains**.
+**Cloudflare Workers** (e.g. netreshworienterprises.com.np):
 
-See **[DEPLOY_CLOUDFLARE.md](./DEPLOY_CLOUDFLARE.md)** for the full guide (env vars, custom domain, GitHub auto-deploy).
+1. `npm install` then `npm run deploy`
+2. Add env vars in Cloudflare Dashboard → your Worker → **Settings → Variables and Secrets** (and **Build variables** if using GitHub).
+3. Add a custom domain under **Workers & Pages** → your project → **Custom domains**.
+
+→ Full guide: **[DEPLOY_CLOUDFLARE.md](./DEPLOY_CLOUDFLARE.md)**
+
+**Vercel:**
+
+1. In [Vercel](https://vercel.com), import your GitHub repo and create a project.
+2. Add the same env vars as in `.env.example` under **Settings → Environment Variables**.
+3. Deploy. Vercel runs `npm run build` (Next.js); the Cloudflare packages in `package.json` are installed but not used on Vercel.
 
 ## Tech Stack
 - Frontend: Next.js 14 (App Router)

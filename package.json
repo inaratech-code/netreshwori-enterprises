@@ -16,6 +16,7 @@
     "seed-brands": "node scripts/seed-brands.js",
     "add-admin": "node scripts/add-admin.js",
     "list-product-images": "node scripts/list-product-images.js",
+    "delete-products": "node scripts/delete-all-products.js",
     "import-products": "node scripts/csv-to-json.js src/data/products.csv -o products-import.json && node scripts/bulk-import-products.js products-import.json",
     "dedupe-products": "node scripts/dedupe-products.js"
   },

@@ -36,6 +36,9 @@ scripts/service-account.json
 .open-next
 .dev.vars
 
+# Vercel (if you also deploy there)
+.vercel
+
 # typescript
 *.tsbuildinfo
 

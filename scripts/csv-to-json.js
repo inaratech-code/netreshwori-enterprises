@@ -92,35 +92,52 @@ function main() {
   const rawHeaders = rows[0].map((h) => h.trim().replace(/^\uFEFF/, ""));
   const keyMap = {
     productcode: "productCode",
+    "product_code": "productCode",
     name: "name",
+    productname: "name",
+    "product_name": "name",
     category: "category",
     brand: "brand",
     size: "size",
     finish: "finish",
     image: "image",
+    image1: "image",
+    image2: "image",
+    image3: "image",
+    "image_1": "image",
+    "image_2": "image",
+    "image_3": "image",
     images: "images",
     imageurl: "image",
+    image_url: "image",
     img: "image",
+    photo: "image",
+    picture: "image",
   };
-  const headers = rawHeaders.map((h) => keyMap[h.toLowerCase().replace(/\s+/g, "")] || h);
+  const headers = rawHeaders.map((h) => {
+    const n = h.toLowerCase().replace(/\s+/g, "");
+    return keyMap[n] || (n.includes("image") || n === "img" ? "image" : null) || h;
+  });
   const products = [];
 
   for (let r = 1; r < rows.length; r++) {
     const row = rows[r];
     const obj = {};
+    const imageValues = [];
     for (let c = 0; c < headers.length; c++) {
       const key = headers[c];
       if (!key) continue;
       let val = (row[c] ?? "").trim();
-      if (key === "image") {
-        if (val) obj[key] = val;
+      if (key === "image" || key === "images") {
+        if (val) {
+          const urls = val.split(/[,\n]+/).map((s) => s.trim()).filter(Boolean);
+          imageValues.push(...urls);
+        }
         continue;
-      }
-      if (key === "images" && typeof val === "string" && val) {
-        val = val.split(",").map((s) => s.trim()).filter(Boolean);
       }
       if (val !== "" && (Array.isArray(val) ? val.length > 0 : true)) obj[key] = val;
     }
+    if (imageValues.length > 0) obj.images = imageValues;
     if (Object.keys(obj).length > 0) products.push(obj);
   }
 
