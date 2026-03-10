@@ -1,8 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged, User, signOut as firebaseSignOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import type { User } from "firebase/auth";
 
 interface AuthContextType {
     user: User | null;
@@ -21,19 +20,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!auth) {
-            setLoading(false);
-            return;
-        }
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-            setLoading(false);
-        });
-        return () => unsubscribe();
+        let unsubscribe: (() => void) | undefined;
+        Promise.all([import("@/lib/firebase"), import("firebase/auth")]).then(([{ auth }, { onAuthStateChanged }]) => {
+            if (!auth) {
+                setLoading(false);
+                return;
+            }
+            unsubscribe = onAuthStateChanged(auth, (u) => {
+                setUser(u);
+                setLoading(false);
+            });
+        }).catch(() => setLoading(false));
+        return () => {
+            if (typeof unsubscribe === "function") unsubscribe();
+        };
     }, []);
 
     const signOut = async () => {
-        if (auth) await firebaseSignOut(auth);
+        try {
+            const [{ auth }, { signOut: firebaseSignOut }] = await Promise.all([
+                import("@/lib/firebase"),
+                import("firebase/auth"),
+            ]);
+            if (auth) await firebaseSignOut(auth);
+        } catch {
+            // ignore if Firebase not available
+        }
         document.cookie = 'admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     };
 
