@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
   try {
     const res = await fetch(fetchUrl, {
       headers: { "User-Agent": "Netreshwori-Website/1.0" },
-      next: { revalidate: 0 },
+      cache: "no-store",
     });
     if (!res.ok) {
       const message =

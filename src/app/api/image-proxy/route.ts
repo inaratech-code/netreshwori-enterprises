@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   try {
     const res = await fetch(parsed.toString(), {
       headers: { "User-Agent": "Netreshwori-Image-Proxy/1.0" },
-      next: { revalidate: 3600 },
+      cache: "default",
     });
     if (!res.ok) {
       return new NextResponse(null, { status: res.status });
