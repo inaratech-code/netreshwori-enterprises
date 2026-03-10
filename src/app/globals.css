@@ -8,6 +8,9 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   :root {
     --background: 220 10% 18%; /* dark mid-tone */
     --foreground: 0 0% 98%;

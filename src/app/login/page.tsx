@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, AlertCircle, Loader2 } from "lucide-react";
 
@@ -17,13 +15,16 @@ export default function LoginPage() {
         e.preventDefault();
         setError("");
         setLoading(true);
-
-        if (!auth) {
-            setError("Login is not available in this environment.");
-            setLoading(false);
-            return;
-        }
         try {
+            const [{ auth }, { signInWithEmailAndPassword }] = await Promise.all([
+                import("@/lib/firebase"),
+                import("firebase/auth"),
+            ]);
+            if (!auth) {
+                setError("Login is not available in this environment.");
+                setLoading(false);
+                return;
+            }
             await signInWithEmailAndPassword(auth, email, password);
             document.cookie = `admin_session=${encodeURIComponent(email)}; path=/; max-age=86400; secure; samesite=strict`;
             router.push("/admin");

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Search, SlidersHorizontal, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import ProductCard from "@/components/product/ProductCard";
 import ProductCardSkeleton from "@/components/product/ProductCardSkeleton";
@@ -10,6 +11,21 @@ import type { Product, Category, Brand } from "@/lib/admin/types";
 import { SIZE_FILTER_OPTIONS, FINISH_FILTER_OPTIONS } from "@/data/filterOptions";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const gridVariants = {
+  hidden: { opacity: 0 },
+  visible: (i: number) => ({
+    opacity: 1,
+    transition: { staggerChildren: 0.04, delayChildren: i * 0.02 },
+  }),
+  exit: { opacity: 0 },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+};
 
 const PAGE_SIZE = 24;
 
@@ -198,7 +214,7 @@ function ProductsContent() {
   }, [filteredBySearch, categories, brands]);
 
   return (
-    <div className="bg-brand-gradient min-h-screen pt-24 pb-16">
+    <div className="bg-brand-gradient min-h-screen pt-24 pb-16 scroll-smooth">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4 tracking-tight">Our Collection</h1>
@@ -231,7 +247,7 @@ function ProductsContent() {
               </button>
               <div
                 id="mobile-filters-panel"
-                className={`overflow-hidden transition-[height] duration-200 ${mobileFiltersOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}
+                className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-out ${mobileFiltersOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}
                 role="region"
                 aria-label="Filter options"
               >
@@ -393,23 +409,50 @@ function ProductsContent() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-12">
-              {loading ? (
-                Array.from({ length: PAGE_SIZE }).map((_, i) => <ProductCardSkeleton key={i} />)
-              ) : (
-                <>
-                  {cardProducts.map((product, i) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      priority={i < 6}
-                      queryParams={{
-                        category: selectedCategoryId ?? undefined,
-                        brand: selectedBrandId ?? undefined,
-                      }}
-                    />
-                  ))}
-                </>
-              )}
+              <AnimatePresence mode="wait">
+                {loading ? (
+                  <motion.div
+                    key="skeletons"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="contents"
+                  >
+                    {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                      <ProductCardSkeleton key={i} />
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="products"
+                    className="contents"
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    variants={gridVariants}
+                    custom={0}
+                  >
+                    {cardProducts.map((product, i) => (
+                      <motion.div
+                        key={product.id}
+                        variants={cardVariants}
+                        layout
+                        transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+                      >
+                        <ProductCard
+                          product={product}
+                          priority={i < 6}
+                          queryParams={{
+                            category: selectedCategoryId ?? undefined,
+                            brand: selectedBrandId ?? undefined,
+                          }}
+                        />
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {!loading && (products.length > 0 || filteredBySearch.length > 0) && (
@@ -449,7 +492,7 @@ function ProductsContent() {
                   type="button"
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 disabled:opacity-60 transition-all"
+                  className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 disabled:opacity-60 transition-all duration-200 ease-out"
                 >
                   {loadingMore ? (
                     <span className="flex items-center gap-2">

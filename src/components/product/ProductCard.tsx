@@ -66,10 +66,10 @@ function ProductCardInner({ product, priority = false, queryParams }: ProductCar
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+      transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
       className={cn(
         "product-card-item group bg-card rounded-2xl border border-border overflow-hidden hover-lift flex flex-col h-full",
-        "transition-shadow duration-200"
+        "transition-shadow duration-300 ease-out"
       )}
     >
       <Link
