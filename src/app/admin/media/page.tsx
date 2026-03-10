@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ImageIcon, Plus, Trash2, Search, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
-import { getMedia, addMediaItem, deleteMediaItem } from "@/lib/admin/firestore";
-import { uploadFile, mediaPath } from "@/lib/admin/storage";
 import type { MediaItem } from "@/lib/admin/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +26,7 @@ export default function AdminMediaPage() {
   const fetchMedia = async () => {
     setLoading(true);
     try {
+      const { getMedia } = await import("@/lib/admin/firestore");
       const list = await getMedia();
       setItems(list);
     } catch {
@@ -65,6 +64,7 @@ export default function AdminMediaPage() {
     if (!item) return;
     const toastId = toast.loading("Deleting...");
     try {
+      const { deleteMediaItem } = await import("@/lib/admin/firestore");
       await deleteMediaItem(deleteId);
       toast.success("Deleted", { id: toastId });
       setItems((prev) => prev.filter((i) => i.id !== deleteId));

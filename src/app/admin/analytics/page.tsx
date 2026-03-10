@@ -12,7 +12,6 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
 } from "recharts";
-import { getAnalyticsEvents, getProduct } from "@/lib/admin/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, Users } from "lucide-react";
 import toast from "react-hot-toast";
@@ -39,6 +38,7 @@ export default function AdminAnalyticsPage() {
     async function load() {
       setLoading(true);
       try {
+        const { getAnalyticsEvents, getProduct } = await import("@/lib/admin/firestore");
         const { from, to } = getDateRange(30);
         const events = await getAnalyticsEvents(from, to);
         const visitorsMap: Record<string, number> = {};

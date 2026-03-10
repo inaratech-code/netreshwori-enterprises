@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Tags, Plus, Edit2, Trash2, Search, X } from "lucide-react";
-import { getDb } from "@/lib/firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, limit } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { useAdminCache } from "../AdminCacheContext";
 
@@ -43,6 +41,10 @@ export default function AdminCategoriesPage() {
     const fetchCategories = async (showLoading = true) => {
         if (showLoading) setLoading(true);
         try {
+            const [{ getDb }, { collection, query, orderBy, getDocs, limit }] = await Promise.all([
+                import("@/lib/firebase"),
+                import("firebase/firestore"),
+            ]);
             const [categoriesSnapshot, productsSnapshot] = await Promise.all([
                 getDocs(query(collection(getDb(), "categories"), orderBy("createdAt", "desc"))),
                 getDocs(query(collection(getDb(), "products"), limit(3000))),
@@ -85,6 +87,10 @@ export default function AdminCategoriesPage() {
         const toastId = toast.loading("Saving category...");
 
         try {
+            const [{ getDb }, { collection, doc, updateDoc, addDoc, serverTimestamp }] = await Promise.all([
+                import("@/lib/firebase"),
+                import("firebase/firestore"),
+            ]);
             if (form.id) {
                 await updateDoc(doc(getDb(), "categories", form.id), {
                     name: form.name,
@@ -125,6 +131,10 @@ export default function AdminCategoriesPage() {
         const toastId = toast.loading("Deleting category...");
 
         try {
+            const [{ getDb }, { doc, deleteDoc }] = await Promise.all([
+                import("@/lib/firebase"),
+                import("firebase/firestore"),
+            ]);
             await deleteDoc(doc(getDb(), "categories", deleteId));
             setCategories(categories.filter(c => c.id !== deleteId));
             toast.success("Category deleted", { id: toastId });

@@ -6,7 +6,6 @@ import { Suspense } from "react";
 import { Search, SlidersHorizontal, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import ProductCard from "@/components/product/ProductCard";
 import ProductCardSkeleton from "@/components/product/ProductCardSkeleton";
-import { getProductsPaginated, getCategories, getBrands } from "@/lib/admin/firestore";
 import type { Product, Category, Brand } from "@/lib/admin/types";
 import { SIZE_FILTER_OPTIONS, FINISH_FILTER_OPTIONS } from "@/data/filterOptions";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -48,6 +47,7 @@ function ProductsContent() {
     async (showLoading = true) => {
       if (showLoading) setLoading(true);
       try {
+        const { getProductsPaginated } = await import("@/lib/admin/firestore");
         const result = await getProductsPaginated(PAGE_SIZE, null, {
           categoryId: selectedCategoryId ?? undefined,
           brandId: selectedBrandId ?? undefined,
@@ -71,6 +71,7 @@ function ProductsContent() {
     if (!hasMore || loadingMore || !lastDoc) return;
     setLoadingMore(true);
     try {
+      const { getProductsPaginated } = await import("@/lib/admin/firestore");
       const result = await getProductsPaginated(PAGE_SIZE, lastDoc, filters);
       setProducts((prev) => [...prev, ...result.products]);
       setLastDoc(result.lastDoc);
@@ -81,8 +82,10 @@ function ProductsContent() {
   }, [hasMore, lastDoc, loadingMore, filters]);
 
   useEffect(() => {
-    getCategories().then(setCategories);
-    getBrands().then(setBrands);
+    import("@/lib/admin/firestore").then((m) => {
+      m.getCategories().then(setCategories);
+      m.getBrands().then(setBrands);
+    });
   }, []);
 
   // Resolve URL category param (can be category name from Explore Our Categories) to Firestore category id

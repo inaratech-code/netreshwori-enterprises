@@ -2,10 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo, startTransition, useCallback, memo } from "react";
 import { Package, Plus, Edit2, Trash2, Search, Loader2, ImagePlus, X, Upload, FileJson, Download, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import { getDb, getStorageSafe } from "@/lib/firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, limit, startAfter, where, writeBatch } from "firebase/firestore";
 import type { DocumentSnapshot } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL, type UploadMetadata } from "firebase/storage";
 import toast from "react-hot-toast";
 import { useAdminCache } from "../AdminCacheContext";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -13,9 +10,25 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { compressImage } from "@/lib/imageCompression";
 import { parseCsvToProducts } from "@/lib/parseCsv";
 import { PARTNER_BRAND_NAMES } from "@/data/partners";
-import { deleteAllProducts } from "@/lib/admin/firestore";
 import { resolveProductImageSrc, isProxyableImageUrl } from "@/lib/utils";
-import { sanitizeStorageFileName } from "@/lib/admin/storage";
+
+async function loadProductsModules() {
+  const [firebase, firestore, storage, adminFirestore, adminStorage] = await Promise.all([
+    import("@/lib/firebase"),
+    import("firebase/firestore"),
+    import("firebase/storage"),
+    import("@/lib/admin/firestore"),
+    import("@/lib/admin/storage"),
+  ]);
+  return {
+    getDb: firebase.getDb,
+    getStorageSafe: firebase.getStorageSafe,
+    ...firestore,
+    ...storage,
+    deleteAllProducts: adminFirestore.deleteAllProducts,
+    sanitizeStorageFileName: adminStorage.sanitizeStorageFileName,
+  };
+}
 
 /** Thumbnail in Add/Edit form: resolves URL (e.g. Drive), shows preview or "Couldn't load" on error. */
 function FormImageThumb({ url, onRemove }: { url: string; onRemove: () => void }) {
@@ -246,6 +259,8 @@ export default function AdminProductsPage() {
             setProductsLoading(true);
         }
         try {
+            const mod = await loadProductsModules();
+            const { getDb, collection, getDocs, addDoc, serverTimestamp, query, orderBy, limit, startAfter } = mod;
             if (!loadMore) {
                 const [categoriesSnapshot, brandsSnapshot] = await Promise.all([
                     getDocs(collection(getDb(), "categories")),
@@ -327,6 +342,8 @@ export default function AdminProductsPage() {
         const uploadingToast = toast.loading(`Uploading ${files.length} image(s)...`);
 
         try {
+            const mod = await loadProductsModules();
+            const { getStorageSafe, ref, uploadBytesResumable, getDownloadURL, sanitizeStorageFileName } = mod;
             const uploads = files.map(async (file): Promise<string> => {
                 const isImage = file.type.startsWith("image/");
                 let data: Blob | File = file;
@@ -345,7 +362,7 @@ export default function AdminProductsPage() {
 
                 const name = sanitizeStorageFileName((file.name.replace(/\.[^.]+$/, "") || "image") + "." + ext);
                 const storageRef = ref(getStorageSafe(), `products/${Date.now()}_${name}`);
-                const metadata: UploadMetadata = { contentType };
+                const metadata = { contentType };
                 const uploadTask = await uploadBytesResumable(storageRef, data, metadata);
                 return await getDownloadURL(uploadTask.ref);
             });
@@ -425,6 +442,7 @@ export default function AdminProductsPage() {
         const toastId = toast.loading("Saving product...");
 
         try {
+            const { getDb, collection, doc, updateDoc, addDoc, serverTimestamp } = await loadProductsModules();
             const productData = {
                 productCode: (form.productCode || "").trim() || undefined,
                 name: form.name,
@@ -475,6 +493,7 @@ export default function AdminProductsPage() {
         const toastId = toast.loading("Deleting product...");
 
         try {
+            const { getDb, doc, deleteDoc } = await loadProductsModules();
             await deleteDoc(doc(getDb(), "products", deleteId));
             setProducts(products.filter(p => p.id !== deleteId));
             toast.success("Product deleted successfully", { id: toastId });
@@ -509,6 +528,7 @@ export default function AdminProductsPage() {
     const toggleStatus = useCallback(async (id: string, currentStatus: string) => {
         const newStatus = currentStatus === "active" ? "hidden" : "active";
         try {
+            const { getDb, doc, updateDoc } = await loadProductsModules();
             await updateDoc(doc(getDb(), "products", id), { status: newStatus });
             setProducts((prev) => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
             toast.success(`Product ${newStatus === "active" ? "unhidden" : "hidden"} successfully`);
@@ -659,12 +679,14 @@ export default function AdminProductsPage() {
         const toastId = toast.loading("Importing products...");
         const CHUNK_SIZE = 50; // Process in chunks to avoid timeouts; Firestore batch max 500
         try {
+            const mod = await loadProductsModules();
+            const { getDb, getStorageSafe, ref, uploadBytesResumable, getDownloadURL, sanitizeStorageFileName, collection, addDoc, serverTimestamp, getDocs, query, where, limit, writeBatch, doc } = mod;
             let imageUrls: string[] = [];
             if (bulkImageFiles.length > 0) {
                 try {
                     const uploads = bulkImageFiles.map(async (file) => {
                         const storageRef = ref(getStorageSafe(), `products/${Date.now()}_${Math.random().toString(36).slice(2)}_${sanitizeStorageFileName(file.name)}`);
-                        const metadata: UploadMetadata = { contentType: file.type || "image/jpeg" };
+                        const metadata = { contentType: file.type || "image/jpeg" };
                         const uploadTask = await uploadBytesResumable(storageRef, file, metadata);
                         return getDownloadURL(uploadTask.ref);
                     });

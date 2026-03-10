@@ -4,7 +4,6 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, MessageCircle, Send, CheckCircle2, Loader2 } from "lucide-react";
-import { createInquiry } from "@/lib/admin/firestore";
 import toast from "react-hot-toast";
 
 const OfficeMap = dynamic(() => import("@/components/contact/OfficeMap"), { ssr: false });
@@ -62,6 +61,7 @@ export default function ContactPage() {
         e.preventDefault();
         setSending(true);
         try {
+            const { createInquiry } = await import("@/lib/admin/firestore");
             await createInquiry({
                 name: form.name.trim(),
                 email: form.email.trim(),

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Save, Loader2, Store, Type } from "lucide-react";
 import toast from "react-hot-toast";
-import { getSettings, setSettings } from "@/lib/admin/firestore";
 import type { Settings } from "@/lib/admin/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +31,7 @@ export default function SettingsPage() {
   useEffect(() => {
     async function load() {
       try {
+        const { getSettings } = await import("@/lib/admin/firestore");
         const data = await getSettings();
         if (data) setFormData({ ...defaultSettings, ...data });
       } catch {
@@ -52,6 +52,7 @@ export default function SettingsPage() {
     e.preventDefault();
     setSaving(true);
     try {
+      const { setSettings } = await import("@/lib/admin/firestore");
       await setSettings(formData);
       toast.success("Settings saved");
     } catch {

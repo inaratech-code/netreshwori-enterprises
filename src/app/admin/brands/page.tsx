@@ -4,8 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { Building2, Plus, Edit2, Trash2, Search, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAdminCache } from "../AdminCacheContext";
-import { getBrands, createBrand, updateBrand, deleteBrand, getProductCountsByBrandIds } from "@/lib/admin/firestore";
-import { uploadFile, brandLogoPath } from "@/lib/admin/storage";
 import type { Brand } from "@/lib/admin/types";
 import { DEALERSHIP_PARTNERS } from "@/data/partners";
 import { Button } from "@/components/ui/button";
@@ -60,6 +58,7 @@ export default function AdminBrandsPage() {
   const fetchBrands = async (showLoading = true) => {
     if (showLoading) setLoading(true);
     try {
+      const { getBrands, deleteBrand, getProductCountsByBrandIds } = await import("@/lib/admin/firestore");
       let list = await getBrands();
       const inconBrand = list.find((b) => b.name.toLowerCase().trim() === "incon ceremic");
       if (inconBrand) {
@@ -109,6 +108,7 @@ export default function AdminBrandsPage() {
     const logoToSave = form.logo || partnerLogo || "";
     const toastId = toast.loading(form.id ? "Updating..." : "Creating...");
     try {
+      const { updateBrand, createBrand } = await import("@/lib/admin/firestore");
       if (form.id) {
         await updateBrand(form.id, {
           name: form.name.trim(),
@@ -139,6 +139,7 @@ export default function AdminBrandsPage() {
     if (!deleteId) return;
     const toastId = toast.loading("Deleting...");
     try {
+      const { deleteBrand } = await import("@/lib/admin/firestore");
       await deleteBrand(deleteId);
       toast.success("Brand deleted", { id: toastId });
       cache.invalidate("brands");
@@ -185,6 +186,7 @@ export default function AdminBrandsPage() {
   const addPartnerAsBrand = async (partner: { name: string; logo: string }) => {
     const toastId = toast.loading("Adding brand...");
     try {
+      const { createBrand } = await import("@/lib/admin/firestore");
       await createBrand({
         name: partner.name,
         logo: partner.logo,

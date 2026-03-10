@@ -4,9 +4,6 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Users, Eye, MessageSquare, Calendar, Package, Building2, Star, Plus, ImageIcon, Inbox } from "lucide-react";
-import { collection, query, limit, getDocs } from "firebase/firestore";
-import { getDb } from "@/lib/firebase";
-import { getBrands, getAnalyticsEvents, getProduct } from "@/lib/admin/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -49,6 +46,15 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     let cancelled = false;
+
+    (async () => {
+      const [{ getDb }, firestoreMod, adminFirestore] = await Promise.all([
+        import("@/lib/firebase"),
+        import("firebase/firestore"),
+        import("@/lib/admin/firestore"),
+      ]);
+      const { collection, query, limit, getDocs } = firestoreMod;
+      const { getBrands, getAnalyticsEvents, getProduct } = adminFirestore;
 
     async function phase1QuickStats() {
       try {
@@ -160,6 +166,8 @@ export default function AdminDashboardPage() {
 
     phase1QuickStats();
     phase2Analytics();
+    })();
+
     return () => {
       cancelled = true;
     };
