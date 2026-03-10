@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { getAuth, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 // Storage bucket must be only the bucket name (e.g. "project-id.appspot.com").
 // If set as gs://... or a full API URL, normalize to avoid "Invalid HTTP method/URL pair" from Firebase.
@@ -39,7 +39,11 @@ const hasConfig =
 
 // When env is missing (e.g. CI build without Build variables), use a placeholder so the build
 // completes. Set NEXT_PUBLIC_FIREBASE_* in your host's Build/Environment variables for production.
-const app: FirebaseApp = !getApps().length
+// Only initialize Firebase in the browser; Cloudflare Workers runtime can throw when running
+// getAuth/getFirestore/getStorage (e.g. unsupported fetch options), causing 500 on SSR.
+const isBrowser = typeof window !== "undefined";
+
+const app: FirebaseApp | null = !getApps().length && isBrowser
   ? initializeApp(
       hasConfig
         ? firebaseConfig
@@ -52,18 +56,32 @@ const app: FirebaseApp = !getApps().length
             appId: "1:0:web:0",
           }
     )
-  : getApp();
+  : getApps().length
+    ? getApp()
+    : null;
 
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+const auth: Auth | null = app ? getAuth(app) : null;
+const db: Firestore | null = app ? getFirestore(app) : null;
+const storage: FirebaseStorage | null = app ? getStorage(app) : null;
+
+/** Use in client code that needs Firestore; throws if not in browser / Firebase not ready. */
+export function getDb(): Firestore {
+  if (!db) throw new Error("Firebase Firestore is not available (e.g. during SSR).");
+  return db;
+}
+
+/** Use in client code that needs Storage; throws if not available. */
+export function getStorageSafe(): FirebaseStorage {
+  if (!storage) throw new Error("Firebase Storage is not available (e.g. during SSR).");
+  return storage;
+}
 
 // Analytics only runs in the browser (required by Firebase)
 let analytics: ReturnType<typeof import("firebase/analytics").getAnalytics> | null = null;
-if (typeof window !== "undefined") {
+if (isBrowser && app) {
   import("firebase/analytics")
     .then(({ getAnalytics }) => {
-      analytics = getAnalytics(app);
+      analytics = getAnalytics(app!);
     })
     .catch(() => {
       // getAnalytics can fail in some environments

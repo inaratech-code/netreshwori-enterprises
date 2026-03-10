@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { collection, query, orderBy, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { getDb } from "@/lib/firebase";
 import { Trash2, Phone, MessageCircle, CheckCircle, Clock, RefreshCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAdminCache } from "../AdminCacheContext";
@@ -29,7 +29,7 @@ export default function InquiriesPage() {
     const fetchInquiries = async (showLoading = true) => {
         if (showLoading) setLoading(true);
         try {
-            const q = query(collection(db, "inquiries"), orderBy("createdAt", "desc"));
+            const q = query(collection(getDb(), "inquiries"), orderBy("createdAt", "desc"));
             const snapshot = await getDocs(q);
             const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Inquiry[];
             setInquiries(data);
@@ -53,7 +53,7 @@ export default function InquiriesPage() {
     const handleDelete = async () => {
         if (!deleteId) return;
         try {
-            await deleteDoc(doc(db, "inquiries", deleteId));
+            await deleteDoc(doc(getDb(), "inquiries", deleteId));
             setInquiries(inquiries.filter((i) => i.id !== deleteId));
             toast.success("Inquiry deleted successfully");
         } catch {
@@ -65,7 +65,7 @@ export default function InquiriesPage() {
 
     const handleMarkContacted = async (id: string) => {
         try {
-            await updateDoc(doc(db, "inquiries", id), {
+            await updateDoc(doc(getDb(), "inquiries", id), {
                 status: "contacted"
             });
             setInquiries(inquiries.map(i => i.id === id ? { ...i, status: "contacted" } : i));

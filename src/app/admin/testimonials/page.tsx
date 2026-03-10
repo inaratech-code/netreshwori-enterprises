@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Plus, Trash2, CheckCircle, XCircle, Search, X, Star } from "lucide-react";
-import { db, storage } from "@/lib/firebase";
+import { getDb, getStorageSafe } from "@/lib/firebase";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { sanitizeStorageFileName } from "@/lib/admin/storage";
@@ -51,7 +51,7 @@ export default function AdminTestimonialsPage() {
     const fetchTestimonials = async (showLoading = true) => {
         if (showLoading) setLoading(true);
         try {
-            const q = query(collection(db, "testimonials"), orderBy("createdAt", "desc"));
+            const q = query(collection(getDb(), "testimonials"), orderBy("createdAt", "desc"));
             const querySnapshot = await getDocs(q);
             const list: Testimonial[] = querySnapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Testimonial));
             setTestimonials(list);
@@ -69,7 +69,7 @@ export default function AdminTestimonialsPage() {
         if (!file) return;
         setUploadingPhoto(true);
         try {
-            const storageRef = ref(storage, `testimonials/${Date.now()}_${sanitizeStorageFileName(file.name)}`);
+            const storageRef = ref(getStorageSafe(), `testimonials/${Date.now()}_${sanitizeStorageFileName(file.name)}`);
             await uploadBytesResumable(storageRef, file);
             const url = await getDownloadURL(storageRef);
             setForm((prev) => ({ ...prev, photo: url }));
@@ -94,7 +94,7 @@ export default function AdminTestimonialsPage() {
 
         try {
             if (form.id) {
-                await updateDoc(doc(db, "testimonials", form.id), {
+                await updateDoc(doc(getDb(), "testimonials", form.id), {
                     name: form.name,
                     message: form.message,
                     rating: Number(form.rating),
@@ -104,7 +104,7 @@ export default function AdminTestimonialsPage() {
                 });
                 toast.success("Testimonial updated", { id: toastId });
             } else {
-                await addDoc(collection(db, "testimonials"), {
+                await addDoc(collection(getDb(), "testimonials"), {
                     name: form.name,
                     message: form.message,
                     rating: Number(form.rating),
@@ -129,7 +129,7 @@ export default function AdminTestimonialsPage() {
         setLoading(true);
         const toastId = toast.loading("Deleting testimonial...");
         try {
-            await deleteDoc(doc(db, "testimonials", deleteId));
+            await deleteDoc(doc(getDb(), "testimonials", deleteId));
             setTestimonials(testimonials.filter(t => t.id !== deleteId));
             toast.success("Testimonial deleted", { id: toastId });
         } catch (error) {
@@ -144,7 +144,7 @@ export default function AdminTestimonialsPage() {
     const toggleStatus = async (id: string, currentStatus: boolean) => {
         const newStatus = !currentStatus;
         try {
-            await updateDoc(doc(db, "testimonials", id), { approved: newStatus });
+            await updateDoc(doc(getDb(), "testimonials", id), { approved: newStatus });
             setTestimonials(testimonials.map(t => t.id === id ? { ...t, approved: newStatus } : t));
             toast.success(newStatus ? "Testimonial approved" : "Testimonial unapproved");
         } catch {

@@ -17,7 +17,7 @@ import {
   type DocumentSnapshot,
   type Query,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { getDb } from "@/lib/firebase";
 import type { Brand, Category, Product, Inquiry, Testimonial, AnalyticsEvent, Settings, MediaItem } from "./types";
 
 const COLLECTIONS = {
@@ -32,7 +32,7 @@ const COLLECTIONS = {
 } as const;
 
 // ---- Brands ----
-export const brandsCol = () => collection(db, COLLECTIONS.brands);
+export const brandsCol = () => collection(getDb(), COLLECTIONS.brands);
 export async function getBrands(): Promise<Brand[]> {
   const snap = await getDocs(query(brandsCol(), orderBy("createdAt", "desc")));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Brand));
@@ -45,10 +45,10 @@ export async function createBrand(data: Omit<Brand, "id">): Promise<string> {
   return ref.id;
 }
 export async function updateBrand(id: string, data: Partial<Brand>): Promise<void> {
-  await updateDoc(doc(db, COLLECTIONS.brands, id), data);
+  await updateDoc(doc(getDb(), COLLECTIONS.brands, id), data);
 }
 export async function deleteBrand(id: string): Promise<void> {
-  await deleteDoc(doc(db, COLLECTIONS.brands, id));
+  await deleteDoc(doc(getDb(), COLLECTIONS.brands, id));
 }
 
 /** Returns product count per brand id (brandId -> count). */
@@ -64,7 +64,7 @@ export async function getProductCountsByBrandIds(brandIds: string[]): Promise<Re
 }
 
 // ---- Categories ----
-export const categoriesCol = () => collection(db, COLLECTIONS.categories);
+export const categoriesCol = () => collection(getDb(), COLLECTIONS.categories);
 export async function getCategories(): Promise<Category[]> {
   const snap = await getDocs(query(categoriesCol(), orderBy("createdAt", "desc")));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Category));
@@ -77,20 +77,20 @@ export async function createCategory(data: Omit<Category, "id">): Promise<string
   return ref.id;
 }
 export async function updateCategory(id: string, data: Partial<Category>): Promise<void> {
-  await updateDoc(doc(db, COLLECTIONS.categories, id), { ...data, updatedAt: serverTimestamp() });
+  await updateDoc(doc(getDb(), COLLECTIONS.categories, id), { ...data, updatedAt: serverTimestamp() });
 }
 export async function deleteCategory(id: string): Promise<void> {
-  await deleteDoc(doc(db, COLLECTIONS.categories, id));
+  await deleteDoc(doc(getDb(), COLLECTIONS.categories, id));
 }
 export async function countProductsByCategory(categoryId: string): Promise<number> {
-  const snap = await getDocs(query(collection(db, COLLECTIONS.products), where("categoryId", "==", categoryId), limit(1)));
+  const snap = await getDocs(query(collection(getDb(), COLLECTIONS.products), where("categoryId", "==", categoryId), limit(1)));
   if (snap.empty) return 0;
-  const full = await getDocs(query(collection(db, COLLECTIONS.products), where("categoryId", "==", categoryId)));
+  const full = await getDocs(query(collection(getDb(), COLLECTIONS.products), where("categoryId", "==", categoryId)));
   return full.size;
 }
 
 // ---- Products ----
-export const productsCol = () => collection(db, COLLECTIONS.products);
+export const productsCol = () => collection(getDb(), COLLECTIONS.products);
 export async function getProducts(constraints: QueryConstraint[] = []): Promise<Product[]> {
   const q = query(productsCol(), ...(constraints.length ? constraints : [orderBy("createdAt", "desc")]));
   const snap = await getDocs(q);
@@ -220,7 +220,7 @@ export async function getSimilarProducts(
 }
 
 export async function getProduct(id: string): Promise<Product | null> {
-  const snap = await getDoc(doc(db, COLLECTIONS.products, id));
+  const snap = await getDoc(doc(getDb(), COLLECTIONS.products, id));
   return snap.exists() ? ({ id: snap.id, ...snap.data() } as Product) : null;
 }
 
@@ -241,10 +241,10 @@ export async function createProduct(data: Omit<Product, "id">): Promise<string> 
   return ref.id;
 }
 export async function updateProduct(id: string, data: Partial<Product>): Promise<void> {
-  await updateDoc(doc(db, COLLECTIONS.products, id), data);
+  await updateDoc(doc(getDb(), COLLECTIONS.products, id), data);
 }
 export async function deleteProduct(id: string): Promise<void> {
-  await deleteDoc(doc(db, COLLECTIONS.products, id));
+  await deleteDoc(doc(getDb(), COLLECTIONS.products, id));
 }
 
 /** Delete all products in the collection. Returns the number deleted. */
@@ -258,7 +258,7 @@ export async function deleteAllProducts(): Promise<number> {
       : query(productsCol(), orderBy("createdAt", "desc"), limit(BATCH_SIZE));
     const snap = await getDocs(q);
     if (snap.empty) break;
-    await Promise.all(snap.docs.map((d) => deleteDoc(doc(db, COLLECTIONS.products, d.id))));
+    await Promise.all(snap.docs.map((d) => deleteDoc(doc(getDb(), COLLECTIONS.products, d.id))));
     totalDeleted += snap.docs.length;
     if (snap.docs.length < BATCH_SIZE) break;
     last = snap.docs[snap.docs.length - 1];
@@ -267,7 +267,7 @@ export async function deleteAllProducts(): Promise<number> {
 }
 
 // ---- Inquiries ----
-export const inquiriesCol = () => collection(db, COLLECTIONS.inquiries);
+export const inquiriesCol = () => collection(getDb(), COLLECTIONS.inquiries);
 export async function getInquiries(): Promise<Inquiry[]> {
   const snap = await getDocs(query(inquiriesCol(), orderBy("createdAt", "desc")));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Inquiry));
@@ -292,14 +292,14 @@ export async function createInquiry(data: {
   return ref.id;
 }
 export async function updateInquiry(id: string, data: Partial<Inquiry>): Promise<void> {
-  await updateDoc(doc(db, COLLECTIONS.inquiries, id), data);
+  await updateDoc(doc(getDb(), COLLECTIONS.inquiries, id), data);
 }
 export async function deleteInquiry(id: string): Promise<void> {
-  await deleteDoc(doc(db, COLLECTIONS.inquiries, id));
+  await deleteDoc(doc(getDb(), COLLECTIONS.inquiries, id));
 }
 
 // ---- Testimonials ----
-export const testimonialsCol = () => collection(db, COLLECTIONS.testimonials);
+export const testimonialsCol = () => collection(getDb(), COLLECTIONS.testimonials);
 export async function getTestimonials(): Promise<Testimonial[]> {
   const snap = await getDocs(query(testimonialsCol(), orderBy("createdAt", "desc")));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Testimonial));
@@ -309,14 +309,14 @@ export async function createTestimonial(data: Omit<Testimonial, "id">): Promise<
   return ref.id;
 }
 export async function updateTestimonial(id: string, data: Partial<Testimonial>): Promise<void> {
-  await updateDoc(doc(db, COLLECTIONS.testimonials, id), data);
+  await updateDoc(doc(getDb(), COLLECTIONS.testimonials, id), data);
 }
 export async function deleteTestimonial(id: string): Promise<void> {
-  await deleteDoc(doc(db, COLLECTIONS.testimonials, id));
+  await deleteDoc(doc(getDb(), COLLECTIONS.testimonials, id));
 }
 
 // ---- Analytics ----
-export const analyticsCol = () => collection(db, COLLECTIONS.analytics_events);
+export const analyticsCol = () => collection(getDb(), COLLECTIONS.analytics_events);
 export async function logAnalyticsEvent(data: Omit<AnalyticsEvent, "id">): Promise<void> {
   await addDoc(analyticsCol(), { ...data, timestamp: serverTimestamp() });
 }
@@ -339,16 +339,16 @@ export async function getAnalyticsEvents(dateFrom: string, dateTo: string, maxDo
 // ---- Settings (single doc) ----
 const SETTINGS_DOC_ID = "general";
 export async function getSettings(): Promise<Settings | null> {
-  const snap = await getDoc(doc(db, COLLECTIONS.settings, SETTINGS_DOC_ID));
+  const snap = await getDoc(doc(getDb(), COLLECTIONS.settings, SETTINGS_DOC_ID));
   return snap.exists() ? (snap.data() as Settings) : null;
 }
 export async function setSettings(data: Partial<Settings>): Promise<void> {
-  const ref = doc(db, COLLECTIONS.settings, SETTINGS_DOC_ID);
+  const ref = doc(getDb(), COLLECTIONS.settings, SETTINGS_DOC_ID);
   await setDoc(ref, data, { merge: true });
 }
 
 // ---- Media ----
-export const mediaCol = () => collection(db, COLLECTIONS.media);
+export const mediaCol = () => collection(getDb(), COLLECTIONS.media);
 export async function getMedia(): Promise<MediaItem[]> {
   const snap = await getDocs(query(mediaCol(), orderBy("createdAt", "desc")));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as MediaItem));
@@ -358,7 +358,7 @@ export async function addMediaItem(data: Omit<MediaItem, "id">): Promise<string>
   return ref.id;
 }
 export async function deleteMediaItem(id: string): Promise<void> {
-  await deleteDoc(doc(db, COLLECTIONS.media, id));
+  await deleteDoc(doc(getDb(), COLLECTIONS.media, id));
 }
 
 export { COLLECTIONS };

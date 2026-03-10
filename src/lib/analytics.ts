@@ -1,5 +1,5 @@
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from "@/lib/firebase";
+import { getDb } from "@/lib/firebase";
 
 export type EventType = 'page_view' | 'product_view' | 'inquiry';
 
@@ -9,7 +9,7 @@ export const trackEvent = async (type: EventType, data: Record<string, unknown> 
         const date = now.toISOString().split('T')[0];
         const hour = now.getHours();
 
-        await addDoc(collection(db, 'analytics_events'), {
+        await addDoc(collection(getDb(), 'analytics_events'), {
             type,
             date,
             hour,

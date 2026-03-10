@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Users, Eye, MessageSquare, Calendar, Package, Building2, Star, Plus, ImageIcon, Inbox } from "lucide-react";
 import { collection, query, limit, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { getDb } from "@/lib/firebase";
 import { getBrands, getAnalyticsEvents, getProduct } from "@/lib/admin/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,8 +53,8 @@ export default function AdminDashboardPage() {
     async function phase1QuickStats() {
       try {
         const [inquiriesSnapshot, productsSnapshot, brandsList] = await Promise.all([
-          getDocs(query(collection(db, "inquiries"), limit(500))),
-          getDocs(query(collection(db, "products"), limit(500))),
+          getDocs(query(collection(getDb(), "inquiries"), limit(500))),
+          getDocs(query(collection(getDb(), "products"), limit(500))),
           getBrands(),
         ]);
         if (cancelled) return;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Tags, Plus, Edit2, Trash2, Search, X } from "lucide-react";
-import { db } from "@/lib/firebase";
+import { getDb } from "@/lib/firebase";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, limit } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { useAdminCache } from "../AdminCacheContext";
@@ -44,8 +44,8 @@ export default function AdminCategoriesPage() {
         if (showLoading) setLoading(true);
         try {
             const [categoriesSnapshot, productsSnapshot] = await Promise.all([
-                getDocs(query(collection(db, "categories"), orderBy("createdAt", "desc"))),
-                getDocs(query(collection(db, "products"), limit(3000))),
+                getDocs(query(collection(getDb(), "categories"), orderBy("createdAt", "desc"))),
+                getDocs(query(collection(getDb(), "products"), limit(3000))),
             ]);
 
             const productCountByCategory: Record<string, number> = {};
@@ -86,14 +86,14 @@ export default function AdminCategoriesPage() {
 
         try {
             if (form.id) {
-                await updateDoc(doc(db, "categories", form.id), {
+                await updateDoc(doc(getDb(), "categories", form.id), {
                     name: form.name,
                     description: form.description || "",
                     updatedAt: serverTimestamp()
                 });
                 toast.success("Category updated", { id: toastId });
             } else {
-                await addDoc(collection(db, "categories"), {
+                await addDoc(collection(getDb(), "categories"), {
                     name: form.name,
                     description: form.description || "",
                     createdAt: serverTimestamp()
@@ -125,7 +125,7 @@ export default function AdminCategoriesPage() {
         const toastId = toast.loading("Deleting category...");
 
         try {
-            await deleteDoc(doc(db, "categories", deleteId));
+            await deleteDoc(doc(getDb(), "categories", deleteId));
             setCategories(categories.filter(c => c.id !== deleteId));
             toast.success("Category deleted", { id: toastId });
         } catch (error) {

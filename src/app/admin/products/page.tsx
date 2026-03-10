@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo, startTransition, useCallback, memo } from "react";
 import { Package, Plus, Edit2, Trash2, Search, Loader2, ImagePlus, X, Upload, FileJson, Download, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import { db, storage } from "@/lib/firebase";
+import { getDb, getStorageSafe } from "@/lib/firebase";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, limit, startAfter, where, writeBatch } from "firebase/firestore";
 import type { DocumentSnapshot } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL, type UploadMetadata } from "firebase/storage";
@@ -248,8 +248,8 @@ export default function AdminProductsPage() {
         try {
             if (!loadMore) {
                 const [categoriesSnapshot, brandsSnapshot] = await Promise.all([
-                    getDocs(collection(db, "categories")),
-                    getDocs(collection(db, "brands")),
+                    getDocs(collection(getDb(), "categories")),
+                    getDocs(collection(getDb(), "brands")),
                 ]);
                 const categoriesList = categoriesSnapshot.docs.map(d => ({ id: d.id, name: d.data().name }));
                 let brandsList = brandsSnapshot.docs.map(d => ({ id: d.id, name: d.data().name }));
@@ -257,7 +257,7 @@ export default function AdminProductsPage() {
                 for (const partnerName of PARTNER_BRAND_NAMES) {
                     const n = partnerName.trim();
                     if (!n || existingBrandNames.has(n.toLowerCase())) continue;
-                    const ref = await addDoc(collection(db, "brands"), {
+                    const ref = await addDoc(collection(getDb(), "brands"), {
                         name: n,
                         logo: "",
                         description: "",
@@ -273,7 +273,7 @@ export default function AdminProductsPage() {
                 setLoading(false);
 
                 const productsSnapshot = await getDocs(
-                    query(collection(db, "products"), orderBy("createdAt", "desc"), limit(INITIAL_PRODUCTS_LIMIT + 1))
+                    query(collection(getDb(), "products"), orderBy("createdAt", "desc"), limit(INITIAL_PRODUCTS_LIMIT + 1))
                 );
                 const docs = productsSnapshot.docs;
                 const hasMore = docs.length > INITIAL_PRODUCTS_LIMIT;
@@ -292,7 +292,7 @@ export default function AdminProductsPage() {
                 setProductsLoading(false);
             } else {
                 const productsSnapshot = await getDocs(
-                    query(collection(db, "products"), orderBy("createdAt", "desc"), startAfter(lastProductDoc!), limit(INITIAL_PRODUCTS_LIMIT + 1))
+                    query(collection(getDb(), "products"), orderBy("createdAt", "desc"), startAfter(lastProductDoc!), limit(INITIAL_PRODUCTS_LIMIT + 1))
                 );
                 const docs = productsSnapshot.docs;
                 const hasMore = docs.length > INITIAL_PRODUCTS_LIMIT;
@@ -344,7 +344,7 @@ export default function AdminProductsPage() {
                 }
 
                 const name = sanitizeStorageFileName((file.name.replace(/\.[^.]+$/, "") || "image") + "." + ext);
-                const storageRef = ref(storage, `products/${Date.now()}_${name}`);
+                const storageRef = ref(getStorageSafe(), `products/${Date.now()}_${name}`);
                 const metadata: UploadMetadata = { contentType };
                 const uploadTask = await uploadBytesResumable(storageRef, data, metadata);
                 return await getDownloadURL(uploadTask.ref);
@@ -439,14 +439,14 @@ export default function AdminProductsPage() {
             };
 
             if (form.id) {
-                await updateDoc(doc(db, "products", form.id), {
+                await updateDoc(doc(getDb(), "products", form.id), {
                     ...productData,
                     updatedAt: serverTimestamp()
                 });
                 toast.success("Product updated successfully", { id: toastId });
                 setProducts(prev => prev.map(p => p.id === form.id ? { ...p, ...productData } : p));
             } else {
-                const ref = await addDoc(collection(db, "products"), {
+                const ref = await addDoc(collection(getDb(), "products"), {
                     ...productData,
                     createdAt: serverTimestamp()
                 });
@@ -475,7 +475,7 @@ export default function AdminProductsPage() {
         const toastId = toast.loading("Deleting product...");
 
         try {
-            await deleteDoc(doc(db, "products", deleteId));
+            await deleteDoc(doc(getDb(), "products", deleteId));
             setProducts(products.filter(p => p.id !== deleteId));
             toast.success("Product deleted successfully", { id: toastId });
         } catch (error) {
@@ -509,7 +509,7 @@ export default function AdminProductsPage() {
     const toggleStatus = useCallback(async (id: string, currentStatus: string) => {
         const newStatus = currentStatus === "active" ? "hidden" : "active";
         try {
-            await updateDoc(doc(db, "products", id), { status: newStatus });
+            await updateDoc(doc(getDb(), "products", id), { status: newStatus });
             setProducts((prev) => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
             toast.success(`Product ${newStatus === "active" ? "unhidden" : "hidden"} successfully`);
         } catch {
@@ -663,7 +663,7 @@ export default function AdminProductsPage() {
             if (bulkImageFiles.length > 0) {
                 try {
                     const uploads = bulkImageFiles.map(async (file) => {
-                        const storageRef = ref(storage, `products/${Date.now()}_${Math.random().toString(36).slice(2)}_${sanitizeStorageFileName(file.name)}`);
+                        const storageRef = ref(getStorageSafe(), `products/${Date.now()}_${Math.random().toString(36).slice(2)}_${sanitizeStorageFileName(file.name)}`);
                         const metadata: UploadMetadata = { contentType: file.type || "image/jpeg" };
                         const uploadTask = await uploadBytesResumable(storageRef, file, metadata);
                         return getDownloadURL(uploadTask.ref);
@@ -697,7 +697,7 @@ export default function AdminProductsPage() {
                         : (p.category?.trim() ? categoryByNameMutable.get(p.category.trim().toLowerCase()) : undefined);
                     if (p.category?.trim() && !categoryId) {
                         const categoryName = p.category.trim();
-                        const catRef = await addDoc(collection(db, "categories"), {
+                        const catRef = await addDoc(collection(getDb(), "categories"), {
                             name: categoryName,
                             description: "",
                             createdAt: serverTimestamp(),
@@ -707,7 +707,7 @@ export default function AdminProductsPage() {
                     }
                     let brandId = p.brandId ?? (p.brand ? brandByNameMutable.get(p.brand.trim().toLowerCase()) : undefined) ?? undefined;
                     if (p.brand?.trim() && !brandId && partnerBrandNamesLower.has(p.brand.trim().toLowerCase())) {
-                        const brandRef = await addDoc(collection(db, "brands"), {
+                        const brandRef = await addDoc(collection(getDb(), "brands"), {
                             name: p.brand.trim(),
                             logo: "",
                             description: "",
@@ -773,7 +773,7 @@ export default function AdminProductsPage() {
                 const existingByNameRefs = await Promise.all(
                     payloads.map(async (item) => {
                         const snap = await getDocs(
-                            query(collection(db, "products"), where("categoryId", "==", item.categoryId), limit(200))
+                            query(collection(getDb(), "products"), where("categoryId", "==", item.categoryId), limit(200))
                         );
                         const match = snap.docs.find((d) => (d.data().name as string)?.trim() === item.productName);
                         return match?.ref ?? null;
@@ -781,7 +781,7 @@ export default function AdminProductsPage() {
                 );
 
                 // 4. Single batch write for this chunk
-                const batch = writeBatch(db);
+                const batch = writeBatch(getDb());
                 for (let i = 0; i < payloads.length; i++) {
                     const existingRef = existingByNameRefs[i];
                     const { payload } = payloads[i];
@@ -789,7 +789,7 @@ export default function AdminProductsPage() {
                         batch.update(existingRef, payload);
                         updatedCount += 1;
                     } else {
-                        const newRef = doc(collection(db, "products"));
+                        const newRef = doc(collection(getDb(), "products"));
                         batch.set(newRef, { ...payload, createdAt: serverTimestamp() });
                         createdCount += 1;
                     }

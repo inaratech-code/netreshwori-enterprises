@@ -18,6 +18,11 @@ export default function LoginPage() {
         setError("");
         setLoading(true);
 
+        if (!auth) {
+            setError("Login is not available in this environment.");
+            setLoading(false);
+            return;
+        }
         try {
             await signInWithEmailAndPassword(auth, email, password);
             document.cookie = `admin_session=${encodeURIComponent(email)}; path=/; max-age=86400; secure; samesite=strict`;

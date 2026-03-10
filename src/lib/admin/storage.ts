@@ -1,5 +1,5 @@
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
-import { storage } from "@/lib/firebase";
+import { getStorageSafe } from "@/lib/firebase";
 
 /** Sanitize a filename for Firebase Storage to avoid "Invalid HTTP method/URL pair" (no slashes or path segments). */
 export function sanitizeStorageFileName(filename: string): string {
@@ -8,13 +8,13 @@ export function sanitizeStorageFileName(filename: string): string {
 }
 
 export async function uploadFile(path: string, file: File): Promise<string> {
-  const storageRef = ref(storage, path);
+  const storageRef = ref(getStorageSafe(), path);
   await uploadBytesResumable(storageRef, file);
   return getDownloadURL(storageRef);
 }
 
 export async function deleteFile(path: string): Promise<void> {
-  const storageRef = ref(storage, path);
+  const storageRef = ref(getStorageSafe(), path);
   await deleteObject(storageRef);
 }
 
