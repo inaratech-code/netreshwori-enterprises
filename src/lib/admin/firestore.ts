@@ -325,11 +325,24 @@ export async function getAnalyticsEvents(dateFrom: string, dateTo: string, maxDo
     const q = query(
       analyticsCol(),
       where("date", ">=", dateFrom),
+      where("date", "<=", dateTo),
+      orderBy("date", "asc"),
       limit(maxDocs)
     );
     const snap = await getDocs(q);
-    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as AnalyticsEvent));
-    return list.filter((e) => e.date <= dateTo).sort((a, b) => a.date.localeCompare(b.date));
+    const list = snap.docs.map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        type: data.type,
+        page: data.page,
+        productId: data.productId,
+        date: data.date,
+        hour: typeof data.hour === "number" ? data.hour : 0,
+        timestamp: data.timestamp,
+      } as AnalyticsEvent;
+    });
+    return list.sort((a, b) => a.date.localeCompare(b.date));
   } catch (err) {
     console.warn("getAnalyticsEvents failed (index or permissions):", err);
     return [];

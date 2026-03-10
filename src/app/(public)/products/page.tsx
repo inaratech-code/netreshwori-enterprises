@@ -28,6 +28,8 @@ const cardVariants = {
 };
 
 const PAGE_SIZE = 24;
+/** Number of skeleton cards shown while the product list is loading (fuller grid during load). */
+const LOADER_SKELETON_COUNT = 36;
 
 function ProductsContent() {
   const searchParams = useSearchParams();
@@ -419,7 +421,7 @@ function ProductsContent() {
                     transition={{ duration: 0.2 }}
                     className="contents"
                   >
-                    {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                    {Array.from({ length: LOADER_SKELETON_COUNT }).map((_, i) => (
                       <ProductCardSkeleton key={i} />
                     ))}
                   </motion.div>
@@ -442,7 +444,7 @@ function ProductsContent() {
                       >
                         <ProductCard
                           product={product}
-                          priority={i < 6}
+                          priority={i < 24}
                           queryParams={{
                             category: selectedCategoryId ?? undefined,
                             brand: selectedBrandId ?? undefined,

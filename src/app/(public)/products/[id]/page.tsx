@@ -13,7 +13,7 @@ const MORE_PRODUCTS_LIMIT = 8;
 const MAGNIFIER_SIZE = 140;
 const MAGNIFIER_ZOOM = 2.2;
 
-function ImageMagnifier({ src, alt, className, onError }: { src: string; alt: string; className?: string; onError?: () => void }) {
+function ImageMagnifier({ src, alt, className, onError, loading = "lazy" }: { src: string; alt: string; className?: string; onError?: () => void; loading?: "lazy" | "eager" }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [show, setShow] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -37,7 +37,7 @@ function ImageMagnifier({ src, alt, className, onError }: { src: string; alt: st
       onMouseLeave={handleMouseLeave}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- magnifier image */}
-      <img src={src} alt={alt} className={className} draggable={false} onError={onError} />
+      <img src={src} alt={alt} className={className} draggable={false} onError={onError} loading={loading} fetchPriority={loading === "eager" ? "high" : undefined} />
       {show && container.width > 0 && (
         <div
           className="pointer-events-none absolute z-10 rounded-full border-2 border-white bg-white/80 shadow-xl overflow-hidden"
@@ -101,6 +101,9 @@ export default function ProductDetailPage() {
         setCategories(cats);
         setBrands(b);
         setNotFound(!p);
+        if (p?.id) {
+          import("@/lib/admin/analytics").then(({ trackProductView }) => trackProductView(p!.id).catch(() => {}));
+        }
       })
       .catch(() => {
         if (!cancelled) setNotFound(true);
@@ -217,6 +220,7 @@ export default function ProductDetailPage() {
                   alt={product.name}
                   className="absolute inset-0 w-full h-full object-cover"
                   onError={() => setMainImageFailed(true)}
+                  loading="eager"
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-slate-400">
@@ -248,6 +252,7 @@ export default function ProductDetailPage() {
                       src={toDisplayUrl(img)}
                       alt=""
                       className="absolute inset-0 w-full h-full object-cover"
+                      loading={idx === 0 ? "eager" : "lazy"}
                     />
                   </button>
                 ))}

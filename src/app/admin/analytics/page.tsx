@@ -47,7 +47,8 @@ export default function AdminAnalyticsPage() {
         let totalPv = 0;
         const productViews: Record<string, number> = {};
 
-        for (let i = 29; i >= 0; i--) {
+        // Last 31 days (from to to inclusive)
+        for (let i = 30; i >= 0; i--) {
           const d = new Date();
           d.setDate(d.getDate() - i);
           visitorsMap[d.toISOString().split("T")[0]] = 0;
@@ -150,8 +151,8 @@ export default function AdminAnalyticsPage() {
               <p className="text-sm text-muted-foreground">Last 30 days</p>
             </CardHeader>
             <CardContent>
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-72 min-h-[288px] w-full">
+                <ResponsiveContainer width="100%" height={288}>
                   <LineChart data={visitorsByDate}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="date" tick={{ fontSize: 12 }} />
@@ -170,8 +171,8 @@ export default function AdminAnalyticsPage() {
               <p className="text-sm text-muted-foreground">Visits by hour (24h)</p>
             </CardHeader>
             <CardContent>
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-72 min-h-[288px] w-full">
+                <ResponsiveContainer width="100%" height={288}>
                   <BarChart data={busyHours}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="hour" tick={{ fontSize: 12 }} />

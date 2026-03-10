@@ -97,6 +97,20 @@ The site references **Bosch Display** in `globals.css` (`/fonts/BoschDisplay-Reg
 
 ---
 
+## 5b. Analytics (Admin Dashboard): Firestore index
+
+If **Admin → Analytics** (or the dashboard charts) shows no data and the browser console has a Firestore error about a missing index:
+
+1. Open the **link in the error message** (Firebase Console → create index for `analytics_events`).
+2. Or in **Firebase Console** → **Firestore** → **Indexes** → **Composite** → add:
+   - Collection: `analytics_events`
+   - Field: `date` (Ascending)
+   - Query scope: Collection
+
+After the index finishes building, analytics and dashboard charts will show visitors and product views.
+
+---
+
 ## 6. Optional: CSV file in the repo
 
 - **Keep `src/data/products.csv`**  

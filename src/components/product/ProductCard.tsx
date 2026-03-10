@@ -83,6 +83,7 @@ function ProductCardInner({ product, priority = false, queryParams }: ProductCar
             alt={product.name}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
             loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : undefined}
             decoding="async"
             onError={() => setImgFailed(true)}
           />

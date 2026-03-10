@@ -35,8 +35,8 @@ export default function AdminDashboardCharts({ chartData }: { chartData?: ChartD
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <h2 className="text-lg font-bold text-slate-900 mb-6">Visitors (Last 30 Days)</h2>
-                    <div className="h-72">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-72 min-h-[288px] w-full">
+                        <ResponsiveContainer width="100%" height={288}>
                             <LineChart data={visitorsByDate}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                 <XAxis dataKey="date" tick={{ fontSize: 12 }} tickMargin={10} minTickGap={30} stroke="#94a3b8" />
@@ -51,8 +51,8 @@ export default function AdminDashboardCharts({ chartData }: { chartData?: ChartD
                 </div>
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <h2 className="text-lg font-bold text-slate-900 mb-6">Busy Hours (24H Format)</h2>
-                    <div className="h-72">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-72 min-h-[288px] w-full">
+                        <ResponsiveContainer width="100%" height={288}>
                             <BarChart data={busyHours}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                 <XAxis dataKey="hour" tick={{ fontSize: 12 }} tickMargin={10} minTickGap={20} stroke="#94a3b8" />
