@@ -13,7 +13,7 @@ If you see **"Output directory 'out' not found"** or **"Wrangler configuration f
 1. In [Cloudflare Dashboard](https://dash.cloudflare.com) go to **Workers & Pages**.
 2. **Create a new project** → **Create application** → choose **Workers** (not Pages).
 3. **Connect to Git** and select the same repository.
-4. Set **Build command:** `npm install && npx opennextjs-cloudflare build`
+4. Set **Build command:** `npm install && npx opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion` (the flag is required for Next.js 14.2.x; OpenNext checks the version before running the build).
 5. Set **Deploy command:** `npx wrangler deploy`
 6. Leave **Build output directory** empty (Workers don’t use it; the deploy command uploads the Worker).
 7. Add all Firebase env vars under **Build variables** (see step 2 below).
@@ -99,7 +99,7 @@ You’ll be prompted to log in to Cloudflare (if not already). The first time, W
 1. In Cloudflare: **Workers & Pages** → **Create** → **Connect to Git**.
 2. Choose **GitHub**, authorize, and select the repo **inaratech-code/netreshwori-enterprises** (or your fork).
 3. **Build settings** (Settings → Build):
-   - **Build command:** `npm install && npx opennextjs-cloudflare build`
+   - **Build command:** `npm install && npx opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion`
    - **Deploy command:** `npx wrangler deploy`
    - **Root directory:** (leave empty if the app is at repo root)
 4. Under **Build variables and secrets**, add every Firebase and `NEXT_PUBLIC_*` variable from step 2 so the Next.js build can read them.
