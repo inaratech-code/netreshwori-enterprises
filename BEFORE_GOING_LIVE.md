@@ -75,7 +75,29 @@ Then you can log in at `https://yoursite.com/login` and use Admin.
 
 ---
 
-## 5. Optional: CSV file in the repo
+## 4b. Firebase Authorized domains (for OAuth / login)
+
+If you see in the browser console: **"The current domain is not authorized for OAuth operations"**:
+
+1. Open **Firebase Console** → **Authentication** → **Settings** (or **Sign-in method** tab) → **Authorized domains**.
+2. Click **Add domain** and add every URL where the app runs:
+   - Your production domain (e.g. `netreshworienterprises.com.np`, `www.netreshworienterprises.com.np`).
+   - Your Cloudflare Worker URL (e.g. `netreshwori-enterprises.inaratech2025.workers.dev`).
+
+Without these, `signInWithPopup` / `signInWithRedirect` and admin login will not work on the deployed site.
+
+---
+
+## 5. Optional: Bosch Display font (avoid 404)
+
+The site references **Bosch Display** in `globals.css` (`/fonts/BoschDisplay-Regular.woff2` and `.woff`). If those files are missing, the browser will 404 and the console will show failed font requests. To fix:
+
+- Add `BoschDisplay-Regular.woff2` and `BoschDisplay-Regular.woff` into **`public/fonts/`** (e.g. from [iframefonts.com](https://iframefonts.com/fonts/bosch-display-font/) if you have a license), or
+- Leave as-is; the `.font-bosch` class will fall back to Georgia/serif and the site still works.
+
+---
+
+## 6. Optional: CSV file in the repo
 
 - **Keep `src/data/products.csv`**  
   Useful as backup and for re-running imports (e.g. after changing categories/brands). It is **not** served to visitors; only the import scripts and Admin use it.
