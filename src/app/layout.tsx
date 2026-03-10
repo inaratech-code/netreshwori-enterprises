@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Toaster } from "react-hot-toast";
 import "./globals.css";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
-// Load only on client so Cloudflare Workers SSR never runs these (can throw or pull in heavy deps).
-const Providers = dynamic(() => import("@/components/auth/Providers").then((m) => m.Providers), { ssr: false });
-const LenisProvider = dynamic(
-  () => import("@/components/providers/LenisProvider").then((m) => ({ default: m.LenisProvider })),
+// Load only on client so Cloudflare Workers SSR does minimal work (avoids 500 from next-themes/lenis/auth).
+const ClientProviders = dynamic(
+  () =>
+    import("@/components/providers/ClientProviders").then((m) => ({ default: m.ClientProviders })),
   { ssr: false }
 );
 
@@ -37,12 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={bodyClassName}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
-          <Providers>
-            <LenisProvider>{children}</LenisProvider>
-            <Toaster position="top-center" />
-          </Providers>
-        </ThemeProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );
