@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import "lenis/dist/lenis.css";
@@ -10,11 +9,8 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 // Load auth (Firebase) only on the client so Cloudflare Workers SSR never runs Firebase SDK.
 const Providers = dynamic(() => import("@/components/auth/Providers").then((m) => m.Providers), { ssr: false });
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-});
+// Use system font; next/font can cause 500 on Cloudflare Workers (loadManifest).
+const bodyClassName = "font-sans antialiased";
 
 export const metadata: Metadata = {
   title: "Netreshwori",
@@ -38,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
+      <body className={bodyClassName}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <Providers>
             <LenisProvider>{children}</LenisProvider>
