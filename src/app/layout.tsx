@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
-import "lenis/dist/lenis.css";
-import { LenisProvider } from "@/components/providers/LenisProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
-// Load auth (Firebase) only on the client so Cloudflare Workers SSR never runs Firebase SDK.
+// Load only on client so Cloudflare Workers SSR never runs these (can throw or pull in heavy deps).
 const Providers = dynamic(() => import("@/components/auth/Providers").then((m) => m.Providers), { ssr: false });
+const LenisProvider = dynamic(
+  () => import("@/components/providers/LenisProvider").then((m) => ({ default: m.LenisProvider })),
+  { ssr: false }
+);
 
 // Use system font; next/font can cause 500 on Cloudflare Workers (loadManifest).
 const bodyClassName = "font-sans antialiased";

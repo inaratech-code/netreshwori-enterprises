@@ -1,5 +1,6 @@
 "use client";
 
+import "lenis/dist/lenis.css";
 import { usePathname } from "next/navigation";
 import { ReactLenis } from "lenis/react";
 
