@@ -86,6 +86,7 @@ export default function AdminBrandsPage() {
     if (!file) return;
     setUploading(true);
     try {
+      const { uploadFile, brandLogoPath } = await import("@/lib/admin/storage");
       const url = await uploadFile(brandLogoPath(file.name), file);
       setForm((prev) => ({ ...prev, logo: url }));
       toast.success("Logo uploaded");
