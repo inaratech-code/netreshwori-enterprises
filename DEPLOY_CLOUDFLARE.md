@@ -4,6 +4,24 @@ This project deploys to **Cloudflare Workers** via the [OpenNext Cloudflare adap
 
 ---
 
+## ⚠️ Using Cloudflare Pages? Switch to Workers
+
+If you see **"Output directory 'out' not found"** or **"Wrangler configuration file was found but it does not appear to be valid"**, your project is set up as **Cloudflare Pages**. This app needs **Cloudflare Workers** (it has API routes and dynamic pages).
+
+**Fix:**
+
+1. In [Cloudflare Dashboard](https://dash.cloudflare.com) go to **Workers & Pages**.
+2. **Create a new project** → **Create application** → choose **Workers** (not Pages).
+3. **Connect to Git** and select the same repository.
+4. Set **Build command:** `npm install && npx opennextjs-cloudflare build`
+5. Set **Deploy command:** `npx wrangler deploy`
+6. Leave **Build output directory** empty (Workers don’t use it; the deploy command uploads the Worker).
+7. Add all Firebase env vars under **Build variables** (see step 2 below).
+
+Your site will be at `https://netreshwori-website.<subdomain>.workers.dev`. You can then add a custom domain (e.g. netreshworienterprises.com.np).
+
+---
+
 ## 1. Install dependencies
 
 From the project root:
@@ -102,8 +120,9 @@ You’ll be prompted to log in to Cloudflare (if not already). The first time, W
 
 ## 6. Troubleshooting
 
-- **Build fails:** Ensure Node.js is 18+. Run `npm run build` first; if that passes, run `npm run deploy`.
-- **Firebase / blank page:** Check that all `NEXT_PUBLIC_FIREBASE_*` variables are set in Cloudflare (Variables and Secrets) and, if using CI, in Build variables.
+- **"Missing Firebase env" or prerender errors during build:** Add **Build variables** in Cloudflare so the build can see your Firebase config. Go to **Workers & Pages** → your project → **Settings** → **Build** (or **Variables**) → **Build variables / Environment variables** and add: `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`, `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID`. Save and retry the build.
+- **Build fails (other):** Ensure Node.js is 18+. Run `npm run build` first; if that passes, run `npm run deploy`.
+- **Firebase / blank page:** Check that all `NEXT_PUBLIC_FIREBASE_*` variables are set in Cloudflare (Variables and Secrets for runtime, and Build variables for the build step).
 - **Custom domain not working:** In Cloudflare, check **Workers & Pages** → your Worker → **Custom domains** and DNS (CNAME or A/AAAA) at your registrar.
 - **Admin redirect / 403:** Set `NEXT_PUBLIC_ADMIN_EMAILS` to a comma-separated list of allowed admin emails.
 

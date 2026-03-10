@@ -33,19 +33,26 @@ const firebaseConfig = {
 };
 
 const hasConfig =
-  firebaseConfig.apiKey &&
-  firebaseConfig.projectId &&
-  firebaseConfig.appId;
+  !!firebaseConfig.apiKey &&
+  !!firebaseConfig.projectId &&
+  !!firebaseConfig.appId;
 
-const app: FirebaseApp = !getApps().length && hasConfig
-  ? initializeApp(firebaseConfig)
-  : getApps().length
-    ? getApp()
-    : (() => {
-        throw new Error(
-          "Missing Firebase env. Copy .env.example to .env.local and add your Firebase config. See FIREBASE_SETUP.md"
-        );
-      })();
+// When env is missing (e.g. CI build without Build variables), use a placeholder so the build
+// completes. Set NEXT_PUBLIC_FIREBASE_* in your host's Build/Environment variables for production.
+const app: FirebaseApp = !getApps().length
+  ? initializeApp(
+      hasConfig
+        ? firebaseConfig
+        : {
+            apiKey: "build-placeholder",
+            authDomain: "build-placeholder.firebaseapp.com",
+            projectId: "build-placeholder",
+            storageBucket: "build-placeholder.appspot.com",
+            messagingSenderId: "0",
+            appId: "1:0:web:0",
+          }
+    )
+  : getApp();
 
 const auth = getAuth(app);
 const db = getFirestore(app);
