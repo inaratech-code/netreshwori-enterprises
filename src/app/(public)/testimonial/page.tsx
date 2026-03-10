@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Star, MessageCircle, CheckCircle2, Loader2, ArrowLeft } from "lucide-react";
-import { createTestimonial } from "@/lib/admin/firestore";
 import toast from "react-hot-toast";
 
 export default function TestimonialPage() {
@@ -16,6 +15,7 @@ export default function TestimonialPage() {
         e.preventDefault();
         setSending(true);
         try {
+            const { createTestimonial } = await import("@/lib/admin/firestore");
             await createTestimonial({
                 name: form.name.trim(),
                 message: form.message.trim(),

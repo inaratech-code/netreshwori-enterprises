@@ -5,7 +5,6 @@ import { useParams, useSearchParams } from "next/navigation";
 import { ChevronRight, Share2, Heart, MessageCircle, Loader2, Search } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { getProduct, getCategories, getBrands, getSimilarProducts, getProductsPaginated } from "@/lib/admin/firestore";
 import type { Product, Category, Brand } from "@/lib/admin/types";
 import { resolveProductImageSrc, isProxyableImageUrl } from "@/lib/utils";
 import ProductCard from "@/components/product/ProductCard";
@@ -94,7 +93,8 @@ export default function ProductDetailPage() {
     let cancelled = false;
     setLoading(true);
     setNotFound(false);
-    Promise.all([getProduct(id), getCategories(), getBrands()])
+    import("@/lib/admin/firestore").then(({ getProduct, getCategories, getBrands }) =>
+      Promise.all([getProduct(id), getCategories(), getBrands()])
       .then(([p, cats, b]) => {
         if (cancelled) return;
         setProduct(p ?? null);
@@ -107,7 +107,8 @@ export default function ProductDetailPage() {
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
-      });
+      })
+    );
     return () => {
       cancelled = true;
     };
@@ -125,31 +126,33 @@ export default function ProductDetailPage() {
     const categoryId = (categoryIdFromUrl || product.categoryId) ?? undefined;
     const brandId = (brandIdFromUrl || product.brandId) ?? undefined;
 
-    if (categoryId) {
-      getSimilarProducts(product.id, categoryId, { brandId, limit: MORE_PRODUCTS_LIMIT })
-        .then((list) => {
-          if (list.length > 0) {
-            setMoreProducts(list);
-            setMoreProductsLoading(false);
-            return;
-          }
-          return getProductsPaginated(MORE_PRODUCTS_LIMIT + 4, null, {})
-            .then((res) => res.products.filter((p) => p.id !== product.id).slice(0, MORE_PRODUCTS_LIMIT));
-        })
-        .then((fallback) => {
-          if (Array.isArray(fallback)) {
-            setMoreProducts(fallback);
-          }
-        })
-        .catch(() => setMoreProducts([]))
-        .finally(() => setMoreProductsLoading(false));
-    } else {
-      getProductsPaginated(MORE_PRODUCTS_LIMIT + 4, null, {})
-        .then((res) => res.products.filter((p) => p.id !== product.id).slice(0, MORE_PRODUCTS_LIMIT))
-        .then(setMoreProducts)
-        .catch(() => setMoreProducts([]))
-        .finally(() => setMoreProductsLoading(false));
-    }
+    import("@/lib/admin/firestore").then(({ getSimilarProducts, getProductsPaginated }) => {
+      if (categoryId) {
+        getSimilarProducts(product.id, categoryId, { brandId, limit: MORE_PRODUCTS_LIMIT })
+          .then((list) => {
+            if (list.length > 0) {
+              setMoreProducts(list);
+              setMoreProductsLoading(false);
+              return;
+            }
+            return getProductsPaginated(MORE_PRODUCTS_LIMIT + 4, null, {})
+              .then((res) => res.products.filter((p) => p.id !== product.id).slice(0, MORE_PRODUCTS_LIMIT));
+          })
+          .then((fallback) => {
+            if (Array.isArray(fallback)) {
+              setMoreProducts(fallback);
+            }
+          })
+          .catch(() => setMoreProducts([]))
+          .finally(() => setMoreProductsLoading(false));
+      } else {
+        getProductsPaginated(MORE_PRODUCTS_LIMIT + 4, null, {})
+          .then((res) => res.products.filter((p) => p.id !== product.id).slice(0, MORE_PRODUCTS_LIMIT))
+          .then(setMoreProducts)
+          .catch(() => setMoreProducts([]))
+          .finally(() => setMoreProductsLoading(false));
+      }
+    });
   }, [product?.id, product?.categoryId, product?.brandId, searchParams]);
 
   const categoryName = product ? categories.find((c) => c.id === product.categoryId)?.name ?? "" : "";

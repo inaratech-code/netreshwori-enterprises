@@ -2,19 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Bosch Display – public site only (purchase from https://iframefonts.com/fonts/bosch-display-font/) */
-@font-face {
-  font-family: "Bosch Display";
-  src: url("/fonts/BoschDisplay-Regular.woff2") format("woff2"),
-       url("/fonts/BoschDisplay-Regular.woff") format("woff");
-  font-weight: 400;
-  font-style: normal;
-  font-display: optional;
-}
-
-/* Public website uses Bosch Display; admin keeps default font */
+/* Public site typography: system serif stack (no 404s; add Bosch to public/fonts/ and uncomment @font-face if you have the font) */
 .font-bosch {
-  font-family: "Bosch Display", Georgia, "Times New Roman", serif;
+  font-family: Georgia, "Times New Roman", "Liberation Serif", serif;
 }
 
 @layer base {
