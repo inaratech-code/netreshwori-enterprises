@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Quote, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
-import { getTestimonials } from "@/lib/admin/firestore";
 import type { Testimonial as TestimonialType } from "@/lib/admin/types";
 
 const FALLBACK = [
@@ -20,7 +19,8 @@ export default function Testimonials() {
 
     useEffect(() => {
         let cancelled = false;
-        getTestimonials()
+        import("@/lib/admin/firestore")
+            .then((m) => m.getTestimonials())
             .then((all) => {
                 if (cancelled) return;
                 const approved = all.filter((t) => t.approved);

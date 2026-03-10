@@ -40,11 +40,22 @@ const hasConfig =
 // When env is missing (e.g. CI build without Build variables), use a placeholder so the build
 // completes. Set NEXT_PUBLIC_FIREBASE_* in your host's Build/Environment variables for production.
 // Only initialize Firebase in the browser; Cloudflare Workers runtime can throw when running
-// getAuth/getFirestore/getStorage (e.g. unsupported fetch options), causing 500 on SSR.
-const isBrowser = typeof window !== "undefined";
+// getAuth/getFirestore/getStorage or even getApps() (e.g. unsupported APIs), causing 500 on SSR.
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
+let storage: FirebaseStorage | null = null;
 
-const app: FirebaseApp | null = !getApps().length && isBrowser
-  ? initializeApp(
+try {
+  const isBrowser = typeof window !== "undefined";
+  const existingApps = getApps().length;
+  if (existingApps) {
+    app = getApp();
+    auth = getAuth(app);
+    db = getFirestore(app);
+    storage = getStorage(app);
+  } else if (isBrowser) {
+    app = initializeApp(
       hasConfig
         ? firebaseConfig
         : {
@@ -55,14 +66,14 @@ const app: FirebaseApp | null = !getApps().length && isBrowser
             messagingSenderId: "0",
             appId: "1:0:web:0",
           }
-    )
-  : getApps().length
-    ? getApp()
-    : null;
-
-const auth: Auth | null = app ? getAuth(app) : null;
-const db: Firestore | null = app ? getFirestore(app) : null;
-const storage: FirebaseStorage | null = app ? getStorage(app) : null;
+    );
+    auth = getAuth(app);
+    db = getFirestore(app);
+    storage = getStorage(app);
+  }
+} catch {
+  // SSR / Cloudflare Workers: Firebase SDK can throw at load or init; keep nulls so app still renders.
+}
 
 /** Use in client code that needs Firestore; throws if not in browser / Firebase not ready. */
 export function getDb(): Firestore {
@@ -78,7 +89,7 @@ export function getStorageSafe(): FirebaseStorage {
 
 // Analytics only runs in the browser (required by Firebase)
 let analytics: ReturnType<typeof import("firebase/analytics").getAnalytics> | null = null;
-if (isBrowser && app) {
+if (typeof window !== "undefined" && app) {
   import("firebase/analytics")
     .then(({ getAnalytics }) => {
       analytics = getAnalytics(app!);
