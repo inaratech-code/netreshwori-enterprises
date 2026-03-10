@@ -510,6 +510,7 @@ export default function AdminProductsPage() {
         setDeletingAll(true);
         const toastId = toast.loading("Deleting all products...");
         try {
+            const { deleteAllProducts } = await loadProductsModules();
             const count = await deleteAllProducts();
             setProducts([]);
             setLastProductDoc(null);

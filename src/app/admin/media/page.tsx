@@ -45,6 +45,10 @@ export default function AdminMediaPage() {
     if (!files.length) return;
     setUploading(true);
     try {
+      const [{ uploadFile, mediaPath }, { addMediaItem }] = await Promise.all([
+        import("@/lib/admin/storage"),
+        import("@/lib/admin/firestore"),
+      ]);
       for (const file of files) {
         const url = await uploadFile(mediaPath(file.name), file);
         await addMediaItem({ url, path: mediaPath(file.name), name: file.name, createdAt: Date.now() });
