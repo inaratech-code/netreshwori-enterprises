@@ -12,11 +12,6 @@ const FOUNDERS = [
         image: "/about/Anil%20Kumar%20bhojania.jpeg",
         role: "Founder",
     },
-    {
-        name: "Amit Kumar Bhojania",
-        image: "/about/Amit%20Kumar%20bhojania.jpeg",
-        role: "Founder",
-    },
 ];
 
 export default function AboutPage() {
