@@ -13,21 +13,46 @@ const MORE_PRODUCTS_LIMIT = 8;
 const MAGNIFIER_SIZE = 140;
 const MAGNIFIER_ZOOM = 2.2;
 
-function ImageMagnifier({ src, alt, className, onError, loading = "lazy" }: { src: string; alt: string; className?: string; onError?: () => void; loading?: "lazy" | "eager" }) {
+function ImageMagnifier({ src, alt, className, onError, loading = "lazy", onLoad }: { src: string; alt: string; className?: string; onError?: () => void; loading?: "lazy" | "eager"; onLoad?: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [show, setShow] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [container, setContainer] = useState({ width: 0, height: 0, left: 0, top: 0 });
+  const [loaded, setLoaded] = useState(false);
+  const rafId = useRef<number | null>(null);
+  const pending = useRef<{ x: number; y: number; w: number; h: number; left: number; top: number } | null>(null);
+  useEffect(() => {
+    setLoaded(false);
+  }, [src]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    setContainer({ width: rect.width, height: rect.height, left: rect.left, top: rect.top });
-    setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    setShow(true);
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    pending.current = { x, y, w: rect.width, h: rect.height, left: rect.left, top: rect.top };
+    if (rafId.current === null) {
+      rafId.current = requestAnimationFrame(() => {
+        rafId.current = null;
+        const p = pending.current;
+        if (p) {
+          setContainer({ width: p.w, height: p.h, left: p.left, top: p.top });
+          setPos({ x: p.x, y: p.y });
+          setShow(true);
+          pending.current = null;
+        }
+      });
+    }
   };
 
-  const handleMouseLeave = () => setShow(false);
+  const handleMouseLeave = () => {
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+    }
+    pending.current = null;
+    setShow(false);
+  };
 
   return (
     <div
@@ -36,11 +61,22 @@ function ImageMagnifier({ src, alt, className, onError, loading = "lazy" }: { sr
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
+      {!loaded && <div className="absolute inset-0 bg-slate-200/80 animate-pulse" aria-hidden />}
       {/* eslint-disable-next-line @next/next/no-img-element -- magnifier image */}
-      <img src={src} alt={alt} className={className} draggable={false} onError={onError} loading={loading} fetchPriority={loading === "eager" ? "high" : undefined} />
+      <img
+        src={src}
+        alt={alt}
+        className={className}
+        draggable={false}
+        onError={onError}
+        onLoad={() => { setLoaded(true); onLoad?.(); }}
+        loading={loading}
+        fetchPriority={loading === "eager" ? "high" : undefined}
+        decoding="async"
+      />
       {show && container.width > 0 && (
         <div
-          className="pointer-events-none absolute z-10 rounded-full border-2 border-white bg-white/80 shadow-xl overflow-hidden"
+          className="pointer-events-none absolute z-10 rounded-full border-2 border-white bg-white/80 shadow-xl overflow-hidden will-change-transform"
           style={{
             width: MAGNIFIER_SIZE,
             height: MAGNIFIER_SIZE,
@@ -209,9 +245,9 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-24">
           <div className="flex flex-col gap-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0.6 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
               className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-200"
             >
               {imgSrc && !mainImageFailed ? (
@@ -253,6 +289,7 @@ export default function ProductDetailPage() {
                       alt=""
                       className="absolute inset-0 w-full h-full object-cover"
                       loading={idx === 0 ? "eager" : "lazy"}
+                      decoding="async"
                     />
                   </button>
                 ))}
@@ -291,7 +328,7 @@ export default function ProductDetailPage() {
                 Contact us to arrange wholesale pricing for your project requirements.
               </p>
               <a
-                href={`https://wa.me/9779864320452?text=I'm interested in ${encodeURIComponent(product.name)}`}
+                href={`https://wa.me/9779858421562?text=I'm interested in ${encodeURIComponent(product.name)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white py-4 rounded-xl font-bold transition-all hover:scale-[1.02] shadow-lg shadow-green-500/20"

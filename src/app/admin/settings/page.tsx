@@ -12,8 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const defaultSettings: Settings = {
   businessName: "Netreshwori Enterprises",
-  phone: "+9779864320452",
-  whatsapp: "+9779864320452",
+  phone: "+9779858421562",
+  whatsapp: "+9779858421562",
   email: "contact@netreshwori.com",
   address: "Kathmandu, Nepal",
   heroTitle: "Premium Tiles for Your Dream Space",

@@ -68,9 +68,9 @@ export default function Footer() {
                                 <MapPin className="w-4 h-4 text-white/90 shrink-0 mt-0.5" />
                                 <span>Branch Office — Get Directions</span>
                             </a>
-                            <a href="tel:+9779864320452" className="flex items-center gap-2 hover:text-white transition-colors">
+                            <a href="tel:+9779858421562" className="flex items-center gap-2 hover:text-white transition-colors">
                                 <Phone className="w-4 h-4 text-white/90 shrink-0" />
-                                <span>+977 9864320452</span>
+                                <span>+977 9858421562</span>
                             </a>
                             <a href="mailto:netreshworienterprises2065@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors break-all">
                                 <Mail className="w-4 h-4 text-white/90 shrink-0" />

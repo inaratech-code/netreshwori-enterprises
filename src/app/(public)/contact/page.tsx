@@ -27,14 +27,14 @@ const contactCards = [
         iconClass: "bg-primary/10 text-primary",
         title: "Call Us",
         subtitle: "Mon–Fri, 9am–6pm",
-        link: { href: "tel:+9779864320452", text: "+977 9864320452" },
+        link: { href: "tel:+9779858421562", text: "+977 9858421562" },
     },
     {
         icon: MessageCircle,
         iconClass: "bg-green-500/10 text-green-600",
         title: "WhatsApp",
         subtitle: "Message us anytime",
-        link: { href: "https://wa.me/9779864320452", text: "Chat on WhatsApp", external: true },
+        link: { href: "https://wa.me/9779858421562", text: "Chat on WhatsApp", external: true },
     },
     {
         icon: Mail,

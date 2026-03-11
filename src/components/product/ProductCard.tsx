@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Star, MessageCircle } from "lucide-react";
 import { cn, resolveProductImageSrc, isProxyableImageUrl } from "@/lib/utils";
 
-const WHATSAPP_NUMBER = "9779864320452";
+const WHATSAPP_NUMBER = "9779858421562";
 
 function buildWhatsAppMessage(name: string, brand: string | undefined, code: string): string {
   const lines = [
