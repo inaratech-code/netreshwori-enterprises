@@ -68,7 +68,7 @@ export default function FeaturedCategories() {
                 >
                     {CATEGORIES.map((category) => (
                         <motion.div key={category.id} variants={itemVariants}>
-                            <Link href={`/products?category=${category.name}`} className="group block relative rounded-2xl overflow-hidden aspect-[4/5] bg-slate-900 isolation-auto">
+                            <a href={`/products?category=${encodeURIComponent(category.name)}`} className="group block relative rounded-2xl overflow-hidden aspect-[4/5] bg-slate-900 isolation-auto">
                                 <div
                                     className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-in-out group-hover:scale-110"
                                     style={{ backgroundImage: `url(${category.image})` }}
@@ -84,7 +84,7 @@ export default function FeaturedCategories() {
                                         </p>
                                     </div>
                                 </div>
-                            </Link>
+                            </a>
                         </motion.div>
                     ))}
                 </motion.div>

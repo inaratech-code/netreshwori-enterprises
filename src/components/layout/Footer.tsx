@@ -47,11 +47,11 @@ export default function Footer() {
                         <div className="flex flex-col gap-4">
                             <h3 className="text-white font-bold text-lg">Categories</h3>
                             <div className="flex flex-col gap-3 text-sm text-white/90">
-                                <Link href="/products?category=Cement" className="hover:text-white transition-colors">Cement</Link>
-                                <Link href="/products?category=CPVC%20%2F%20PVC" className="hover:text-white transition-colors">CPVC / PVC</Link>
-                                <Link href="/products?category=Granite%20%2F%20Marble" className="hover:text-white transition-colors">Granite / Marble</Link>
-                                <Link href="/products?category=Floor%20Tile" className="hover:text-white transition-colors">Floor Tile</Link>
-                                <Link href="/products?category=Wall%20%2F%20Floor%20Tile" className="hover:text-white transition-colors">Wall / Floor Tile</Link>
+                                <a href="/products?category=Cement" className="hover:text-white transition-colors">Cement</a>
+                                <a href="/products?category=CPVC%20%2F%20PVC" className="hover:text-white transition-colors">CPVC / PVC</a>
+                                <a href="/products?category=Granite%20%2F%20Marble" className="hover:text-white transition-colors">Granite / Marble</a>
+                                <a href="/products?category=Floor%20Tile" className="hover:text-white transition-colors">Floor Tile</a>
+                                <a href="/products?category=Wall%20%2F%20Floor%20Tile" className="hover:text-white transition-colors">Wall / Floor Tile</a>
                             </div>
                         </div>
                     </div>
